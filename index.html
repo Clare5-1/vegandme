@@ -1,43 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-    <title>Veg&Me Map ｜ 葷素共食地圖</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veg&Me Map ｜ 葷素共食地圖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <nav class="navbar">
-        <span class="logo">🥗 Veg&Me Map</span>
-        <div class="nav-links">
-            <a href="index.html" class="active">首頁 Home</a>
-            <a href="map.html">尋找餐廳 Find Map</a>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🥗</span>
+                <span class="logo-text">Veg&Me <span class="logo-highlight">Map</span></span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-item active">首頁 Home</a>
+                <a href="map.html" class="nav-item btn-nav-map">尋找餐廳 Find Map ➔</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <div class="homepage-container">
-        <h1>Veg&Me Map ｜ 葷素共食地圖</h1>
-        
-        <p class="intro-zh">
-            聚餐常常卡在「有人吃素、有人吃肉」嗎？<br>
-            邀請你一起建立「葷素共食」地圖！主打好搜尋、即時顯示營業狀態。
-        </p>
-        
-        <p class="intro-en">
-            Tired of arguing over where to eat with veg and non-veg friends?<br>
-            Help us create the ultimate food map! It’s simple to use, easy to search, and shows real-time open/closed status.
-        </p>
+    <main class="hero-section">
+        <div class="hero-container">
+            
+            <div class="hero-content">
+                <div class="badge-tag">Community Project ｜ 社群共創</div>
+                <h1>聚餐常常卡在<br><span class="text-gradient">「有人吃素、有人吃肉」</span>嗎？</h1>
+                
+                <p class="hero-desc-zh">
+                    我們正在打造一個讓「蔬食與肉食者」都能開心共餐的友善地圖！主打直覺好搜尋、並能即時顯示店家營業狀態。
+                </p>
+                <p class="hero-desc-en">
+                    Tired of arguing over where to eat with veg and non-veg friends? Help us create the ultimate food map! It’s simple to use, easy to search, and shows real-time open/closed status instantly.
+                </p>
 
-        <div class="help-box">
-            📣 真心需要大家幫忙填空，歡迎分享你的聚餐愛店！<br>
-            📣 We really need your recommendations—please help us by adding your favorite spots!
+                <div class="cta-group">
+                    <a href="map.html" class="btn btn-primary">🔍 開始搜尋 Start Searching</a>
+                    <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="btn btn-secondary">✍️ 分享口袋名單 Contribute</a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="feature-card">
+                    <div class="card-icon">🗺️</div>
+                    <h3>葷素共食地圖亮點</h3>
+                    <ul class="feature-list">
+                        <li><strong>一鍵隨搜：</strong> 快速篩選純素、蛋奶素或友善餐廳</li>
+                        <li><strong>時間同步：</strong> 即時查看當下營業中或已休息店家</li>
+                        <li><strong>完全免費：</strong> 由在地社群共同填空、分享愛店</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
-
-        <div class="cta-buttons">
-            <a href="map.html" class="btn-primary">🔍 開始搜尋 Start Searching</a>
-            <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="btn-secondary">✍️ 分享口袋名單 Contribute</a>
-        </div>
-    </div>
+    </main>
 
 </body>
 </html>
