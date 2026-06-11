@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veg&Me | Taiwan Veg Map</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        #map { height: 100vh; width: 100vw; }
+        
+        /* Header Title Bar */
+        .header-bar {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95); padding: 10px 20px;
+            border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            z-index: 1000; font-weight: bold; font-size: 1.2rem; color: #2e7d32;
+            display: flex; align-items: center; gap: 8px; pointer-events: none;
+        }
+
+        /* Custom Beautiful Map Pins */
+        .map-pin {
+            width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
+            position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -12px 0 0 -12px;
+            box-shadow: -1px 2px 3px rgba(0,0,0,0.3); border: 2px solid white;
+        }
+        .map-pin::after {
+            content: ''; width: 8px; height: 8px; margin: 8px 0 0 8px; background: white;
+            position: absolute; border-radius: 50%;
+        }
+        .pin-open { background: #4CAF50; }  /* Green */
+        .pin-closed { background: #9E9E9E; } /* Grey */
+
+        /* Inside the popup text window */
+        .popup-title { font-weight: bold; font-size: 1.1rem; color: #1b5e20; margin-bottom: 5px; }
+        .popup-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; margin-right: 4px; margin-top: 4px;}
+        .tag-dietary { background: #81c784; }
+        .tag-shop { background: #4f83cc; }
+        .popup-info { font-size: 0.85rem; margin-top: 6px; color: #424242; line-height: 1.4; }
+        .status-text { font-weight: bold; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">🌱 Veg&Me Map</div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <script>
+        // 1. Initialize Map centered on Taiwan
+        const map = L.map('map').setView([23.6, 121.0], 8);
+
+        // Load free OpenStreetMap map backgrounds (Tiles)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // YOUR LIVE GOOGLE SHEET CSV LINK
+        const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFyCfwrZTOpDkmpHsU2qlNmnVltRGxs0TZLbvRB0EL3d-donR3HdkY1vR4bBFxQtN2X_D0D2c5KW5n/pub?output=csv';
+
+        // 2. Fetch data from your Google Sheet live
+        Papa.parse(googleSheetCsvUrl, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                const data = results.data;
+                const currentHour = new Date().getHours(); // Detects user's phone hour (0-23)
+                let validMarkers = [];
+
+                data.forEach(row => {
+                    // Check if row has valid GPS coordinates
+                    if (row.Latitude && row.Longitude) {
+                        const lat = parseFloat(row.Latitude);
+                        const lng = parseFloat(row.Longitude);
+                        const openH = parseInt(row.OpenHour);
+                        const closeH = parseInt(row.CloseHour);
+                        
+                        // Calculate Open vs Closed Logic
+                        let isOpen = false;
+                        if (currentHour >= openH && currentHour < closeH) {
+                            isOpen = true;
+                        }
+
+                        // Determine Pin Color Style Class
+                        const pinStyleClass = isOpen ? 'pin-open' : 'pin-closed';
+                        const statusLabel = isOpen ? '🟢 營業中 (Open Now)' : '🔘 休息中 (Closed)';
+
+                        // Create custom html element pin icon
+                        const customIcon = L.divIcon({
+                            className: 'custom-pin-container',
+                            html: `<div class="map-pin ${pinStyleClass}"></div>`,
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 24],
+                            popupAnchor: [0, -24]
+                        });
+
+                        // Create beautiful layout inside the popup box when user taps a pin
+                        const popupContent = `
+                            <div class="popup-title">${row.Name}</div>
+                            <div>
+                                <span class="popup-tag tag-dietary">${row.Dietary || 'Food'}</span>
+                                <span class="popup-tag tag-shop">${row.ShopType === 'Pure' ? '純素餐廳' : '葷素共食'}</span>
+                            </div>
+                            <div class="popup-info">
+                                <strong>📍 地址:</strong> ${row.Address}<br>
+                                <strong>⏰ 營業時間:</strong> ${openH}:00 - ${closeH}:00<br>
+                                <div class="status-text" style="color: ${isOpen ? '#2e7d32' : '#757575'}">${statusLabel}</div>
+                                ${row.Review ? `<hr style="border:0; border-top:1px solid #ddd; margin:8px 0;"><em>"${row.Review}"</em>` : ''}
+                            </div>
+                        `;
+
+                        // Place the marker onto the map
+                        const marker = L.marker([lat, lng], { icon: customIcon })
+                            .bindPopup(popupContent);
+                        
+                        marker.addTo(map);
+                        validMarkers.push(marker);
+                    }
+                });
+
+                // Auto-zoom map to fit all your markers beautifully
+                if (validMarkers.length > 0) {
+                    const group = new L.featureGroup(validMarkers);
+                    map.fitBounds(group.getBounds().pad(0.2));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
