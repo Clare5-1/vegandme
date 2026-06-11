@@ -1,1 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veg&Me | Taiwan Veg Map</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        #map { height: 100vh; width: 100vw; }
+        
+        .header-bar {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95); padding: 10px 20px;
+            border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            z-index: 1000; font-weight: bold; font-size: 1.2rem; color: #2e7d32;
+        }
+
+        /* Custom Map Pins */
+        .map-pin {
+            width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
+            position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -12px 0 0 -12px;
+            box-shadow: -1px 2px 3px rgba(0,0,0,0.3); border: 2px solid white;
+        }
+        .map-pin::after {
+            content: ''; width: 8px; height: 8px; margin: 8px 0 0 8px; background: white;
+            position: absolute; border-radius: 50%;
+        }
+        .pin-open { background: #4CAF50; }  
+        .pin-closed { background: #9E9E9E; } 
+
+        /* Popup Box Styles */
+        .popup-title { font-weight: bold; font-size: 1.1rem; color: #1b5e20; margin-bottom: 5px; }
+        .popup-tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; margin-right: 4px; margin-top: 4px;}
+        .tag-dietary { background: #4caf50; }
+        .tag-shop { background: #0288d1; }
+        .popup-info { font-size: 0.85rem; margin-top: 8px; color: #424242; line-height: 1.5; }
+        .status-text { font-weight: bold; margin-top: 5px; }
+        .photo-link { display: inline-block; margin-top: 8px; color: #0288d1; text-decoration: none; font-weight: bold; }
+        .photo-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">🌱 Veg&Me Map</div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <script>
+        const map = L.map('map').setView([23.6, 121.0], 8);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Smart Code Transformer for Shortcodes & Form Responses
+        function translateDietary(tag) {
+            if (!tag) return '蔬食 / Veg';
+            let t = tag.toUpperCase().trim();
+            if (t === 'V' || t.includes('V :') || t.includes('VEGAN')) return '🌱 全素 / Vegan';
+            if (t === 'O' || t.includes('O :') || t.includes('OVO')) return '🥚 蛋素 / Ovo';
+            if (t === 'L' || t.includes('L :') || t.includes('LACTO')) return '🥛 奶素 / Lacto';
+            if (t === 'VO' || t.includes('VO :') || t.includes('OVO-LACTO')) return '🥚🥛 蛋奶素 / Ovo-Lacto';
+            if (t === 'P' || t.includes('P :') || t.includes('PUNGENT')) return '🧅 五辛素 / Pentarian';
+            if (t === 'D' || t.includes('D :') || t.includes('DESSERT')) return '🍰 甜點 / Dessert';
+            return tag; 
+        }
+
+        function translateShopType(type) {
+            if (!type) return '店家 / Shop';
+            let t = type.toUpperCase().trim();
+            if (t === 'PURE' || t === 'P' || t.includes('純素')) return '🏪 純素餐廳 / 100% Veg';
+            if (t === 'FRIENDLY' || t === 'F' || t.includes('葷素')) return '🥗 葷素共食 / Friendly';
+            return type;
+        }
+
+        const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFyCfwrZTOpDkmpHsU2qlNmnVltRGxs0TZLbvRB0EL3d-donR3HdkY1vR4bBFxQtN2X_D0D2c5KW5n/pub?output=csv';
+
+        Papa.parse(googleSheetCsvUrl, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                const data = results.data;
+                const currentHour = new Date().getHours(); 
+                let validMarkers = [];
+
+                data.forEach(row => {
+                    if (row.Latitude && row.Longitude) {
+                        const lat = parseFloat(row.Latitude);
+                        const lng = parseFloat(row.Longitude);
+                        const openH = parseInt(row.OpenHour);
+                        const closeH = parseInt(row.CloseHour);
+                        
+                        // Calculate Open/Closed status
+                        let isOpen = false;
+                        if (currentHour >= openH && currentHour < closeH) {
+                            isOpen = true;
+                        }
+
+                        const pinStyleClass = isOpen ? 'pin-open' : 'pin-closed';
+                        const statusLabel = isOpen ? '🟢 營業中 (Open Now)' : '🔘 休息中 (Closed)';
+
+                        const customIcon = L.divIcon({
+                            className: 'custom-pin-container',
+                            html: `<div class="map-pin ${pinStyleClass}"></div>`,
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 24],
+                            popupAnchor: [0, -24]
+                        });
+
+                        // Dynamic Photo Link Check
+                        // If your sheet has a column named "Image" or "Photo", it will display here
+                        const photoUrl = row.Image || row.Photo || row.ImageUrl;
+                        const photoHtml = photoUrl ? `<a href="${photoUrl}" target="_blank" class="photo-link">📸 查看菜單/照片 (View Photo)</a>` : '';
+
+                        const popupContent = `
+                            <div class="popup-title">${row.Name}</div>
+                            <div>
+                                <span class="popup-tag tag-dietary">${translateDietary(row.Tag || row.Dietary)}</span>
+                                <span class="popup-tag tag-shop">${translateShopType(row.ShopType || '')}</span>
+                            </div>
+                            <div class="popup-info">
+                                <strong>📍 地址 / Addr:</strong> ${row.Address}<br>
+                                <strong>⏰ 時間 / Hours:</strong> ${openH}:00 - ${closeH}:00<br>
+                                <div class="status-text" style="color: ${isOpen ? '#2e7d32' : '#757575'}">${statusLabel}</div>
+                                ${photoHtml}
+                                ${row.Review ? `<hr style="border:0; border-top:1px solid #ddd; margin:8px 0;"><em>"${row.Review}"</em>` : ''}
+                            </div>
+                        `;
+
+                        const marker = L.marker([lat, lng], { icon: customIcon }).bindPopup(popupContent);
+                        marker.addTo(map);
+                        validMarkers.push(marker);
+                    }
+                });
+
+                if (validMarkers.length > 0) {
+                    const group = new L.featureGroup(validMarkers);
+                    map.fitBounds(group.getBounds().pad(0.2));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
 
