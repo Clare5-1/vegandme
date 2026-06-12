@@ -1,4 +1,4 @@
-/* --- 基礎重設 --- */
+/* --- 基礎設定 --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,29 +6,34 @@
 }
 
 body {
-    background-color: #0b0c10; /* 深色底，符合大圖質感 */
+    background-color: #0b0c10;
     font-family: 'Inter', 'Noto Sans TC', sans-serif;
     color: #ffffff;
+    overflow-x: hidden;
 }
 
-/* --- 滿版背景主視覺 --- */
+/* --- 多國語言顯示隱藏邏輯 (關鍵核心) --- */
+body:not(.en-mode) .lang-en { display: none !important; }
+body.en-mode .lang-zh { display: none !important; }
+
+/* --- 滿版背景 (套用你的精美新圖) --- */
 .hero-fullscreen {
     position: relative;
     width: 100%;
-    height: 90vh; /* 佔據螢幕 90% 的高度，非常大器 */
+    height: 92vh;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 讓文字絕對置中 */
+    justify-content: flex-end; /* 讓網頁按鈕沉到底部 */
     align-items: center;
     
-    /* 背景圖片設定：這裡使用了極具質感的暗色蔬菜大圖作為範例 */
-    /* linear-gradient 就是那層黑色的半透明保護濾鏡，讓白字更清晰 */
-    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), 
-                url('https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1800') no-repeat center center;
+    /* 這裡綁定你上傳的 hero-bg.png */
+    /* 微弱的深色漸層濾鏡，保護頂部導覽列的閱讀清晰度 */
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.4)), 
+                url('hero-bg.png') no-repeat center center;
     background-size: cover;
 }
 
-/* --- 透明導覽列 --- */
+/* --- 導覽列佈局 --- */
 .transparent-navbar {
     position: absolute;
     top: 0;
@@ -37,64 +42,146 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 30px 60px;
+    padding: 35px 50px;
     z-index: 10;
 }
 
 .nav-logo {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 900;
     letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.nav-right-group {
+    display: flex;
+    align-items: center;
+    gap: 40px;
 }
 
 .nav-menu {
     display: flex;
-    gap: 40px;
+    gap: 30px;
 }
 
 .nav-item {
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 1px;
-    transition: color 0.2s ease;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    transition: color 0.2s;
 }
 
 .nav-item:hover, .nav-item.active {
-    color: #ffffff; /* 滑鼠移過去或作用中變成純白 */
+    color: #ffffff;
 }
 
-/* --- 置中巨型文字 --- */
-.hero-center-content {
+/* --- 右上角語言切換按鈕樣式 --- */
+.language-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px); /* 摩登微模糊玻璃效果 */
+}
+
+.lang-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.lang-btn:hover, .lang-btn.active {
+    color: #ffffff;
+}
+
+.divider {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 12px;
+}
+
+/* --- 底部行動呼籲膠囊按鈕 --- */
+.hero-bottom-actions {
+    margin-bottom: 60px;
+    z-index: 5;
+}
+
+.cta-pill-btn {
+    display: inline-block;
+    text-decoration: none;
+    color: #111111;
+    background-color: #ffffff;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.cta-pill-btn:hover {
+    transform: translateY(-2px);
+    background-color: #f0f0f0;
+}
+
+/* --- 下方故事介紹區塊 --- */
+.intro-section {
+    background-color: #0b0c10;
+    padding: 90px 40px;
     text-align: center;
-    padding: 0 20px;
 }
 
-.giant-title {
-    font-size: 100px; /* 超大粗體字，完美複製 image_bd3ae2.jpg 的震撼感 */
-    font-weight: 900;
-    letter-spacing: -2px;
-    line-height: 1;
-    margin-bottom: 20px;
+.container-narrow {
+    max-width: 700px;
+    margin: 0 auto;
 }
 
-.elegant-subtitle {
-    font-family: 'Playfair Display', 'Noto Sans TC', serif;
-    font-style: italic; /* 優雅的斜體襯線字 */
-    font-size: 32px;
-    color: rgba(255, 255, 255, 0.9);
+.story-text {
+    font-size: 17px;
+    line-height: 1.85;
+    color: #cccccc;
+    margin-bottom: 40px;
+    font-weight: 500;
 }
 
-/* RWD 手機板彈性調整 */
+.form-link-btn {
+    display: inline-block;
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 4px;
+    transition: opacity 0.2s;
+}
+
+.form-link-btn:hover {
+    opacity: 0.8;
+}
+
+/* 手機板適應 (RWD) */
 @media (max-width: 768px) {
     .transparent-navbar {
-        padding: 24px 30px;
+        padding: 25px 20px;
+        flex-direction: column;
+        gap: 15px;
     }
-    .giant-title {
-        font-size: 55px;
+    .nav-right-group {
+        gap: 20px;
     }
-    .elegant-subtitle {
-        font-size: 22px;
+    .hero-fullscreen {
+        height: 80vh;
+    }
+    .story-text {
+        font-size: 15px;
     }
 }
