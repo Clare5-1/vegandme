@@ -4,154 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veg&Me Map ｜ 葷素共食地圖</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 1. Modern Header & Hero Section -->
-    <header class="main-header">
-        <div class="header-container">
-            <div class="logo">
-                <span class="logo-icon">🥗</span>
-                <span class="logo-text">Veg&Me <span class="logo-highlight">Map</span></span>
-            </div>
-            <nav class="nav-links">
-                <a href="index.html" class="nav-item active">首頁 Home</a>
-                <a href="map.html" class="nav-item btn-nav-map">尋找餐廳 Find Map ➔</a>
+    <!-- Main Floating Canvas (Like Bobbin Layout) -->
+    <div class="main-canvas">
+        
+        <!-- Header / Logo Area -->
+        <header class="site-header">
+            <div class="logo">🥗 Veg&Me <span class="logo-badge">Map</span></div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="map.html" class="nav-link btn-map">Open Map ➔</a>
             </nav>
-        </div>
-    </header>
+        </header>
 
-    <main class="hero-section">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="badge-tag">Community Project ｜ 社群共創</div>
-                <h1>聚餐常常卡在<br><span class="text-gradient">「有人吃素、有人吃肉」</span>嗎？</h1>
-                
-                <p class="hero-desc-zh">
-                    邀請你一起建立「葷素共食」地圖！主打好搜尋、即時顯示營業狀態。真心需要大家幫忙填空，歡迎分享你的聚餐愛店！
-                </p>
-                <p class="hero-desc-en">
-                    Help us create the ultimate veg & non-veg food map! It’s simple to use and shows real-time open/closed status. We really need your recommendations!
-                </p>
+        <!-- 1. Hero Block -->
+        <section class="hero-block">
+            <div class="tag-pill">✨ Community Share Map / 社群共創地圖</div>
+            <h1>聚餐常常卡在<br><span class="highlight-text">「有人吃素、有人吃肉」</span>嗎？</h1>
+            
+            <p class="desc-zh">
+                邀請你一起建立「葷素共食」地圖！主打好搜尋、即時顯示營業狀態。真心需要大家幫忙填空，歡迎分享你的聚餐愛店！
+            </p>
+            <p class="desc-en">
+                Help us create the ultimate veg & non-veg food map! It’s simple to use and shows real-time open/closed status. We really need your recommendations!
+            </p>
 
-                <div class="cta-group">
-                    <a href="map.html" class="btn btn-primary">🔍 開始搜尋 Start Searching</a>
-                    <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="btn btn-sharebox">✍️ 分享口袋名單 Share Box</a>
-                </div>
+            <!-- Big Main Action Buttons -->
+            <div class="action-grid">
+                <a href="map.html" class="main-btn btn-green">🔍 開始搜尋 Start Searching</a>
+                <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="main-btn btn-orange">✍️ 分享口袋名單 Share Box</a>
             </div>
+        </section>
 
-            <div class="hero-visual">
-                <div class="status-preview-card">
-                    <div class="preview-header">💡 營業狀態一目了然</div>
-                    <div class="preview-item">
-                        <span class="status-dot dot-green"></span> 
-                        <strong>綠色標記 Green:</strong> 營業中 Open Now
-                    </div>
-                    <div class="preview-item">
-                        <span class="status-dot dot-grey"></span> 
-                        <strong>灰色標記 Grey:</strong> 已休息 Closed
-                    </div>
-                    <p class="preview-note">不必再一家家點開檢查，出遊找店超輕鬆！</p>
-                </div>
-            </div>
+        <!-- Visual Feature Divider -->
+        <div class="status-legend-bar">
+            <div class="legend-item"><span class="dot dot-green"></span> 綠色標記 Green = 營業中 Open Now</div>
+            <div class="legend-item"><span class="dot dot-grey"></span> 灰色標記 Grey = 已休息 Closed</div>
         </div>
-    </main>
 
-    <!-- 2. My Story Section -->
-    <section class="story-section">
-        <div class="section-container">
-            <div class="story-box">
-                <div class="story-heart">❤️</div>
-                <h2>為什麼建立這個網站？ ｜ Our Story</h2>
-                
-                <div class="story-text-zh">
+        <!-- 2. Our Story Block -->
+        <section class="block-section story-block">
+            <div class="block-badge">❤️ OUR STORY / 我們的故事</div>
+            <div class="story-grid">
+                <div class="story-zh">
                     <p>我本身不吃素，但我深深愛著一位吃「蛋奶素」的伴侶。過去，我們常常為了找到一家能讓兩個人都開心吃飽、好好坐下來聚一聚的餐廳而傷透腦筋。</p>
-                    <p>吃素的人要和葷食朋友一起吃飯，或者只想單純找個能好好共度時光的地方，真的比想像中還要困難。我知道那種在路上找不到餐廳、甚至在人生地不熟的地方旅遊時，必須一家一家點開 Google Map 確認到底是開是關的挫折感。</p>
-                    <p>這張共享地圖我默默經營了幾年，現在希望把它開放出來，幫助每一個有相同困擾的人。我特別設計了<strong>「綠色代表營業、灰色代表休息」</strong>的功能，就是希望讓大家不再為吃飯卡關。只想讓找餐廳這件事，變得更簡單。</p>
+                    <p>吃素的人要和葷食朋友一起吃飯，或者只想單純找個能好好共度時光的地方，真的比想像中還要困難。我知道那種在路上找不到餐廳、甚至在人生地不熟的地方旅遊時，必須一家一家點開 Google Map 確認營業時間的挫折感。</p>
+                    <p>這張共享地圖我默默經營了幾年，現在希望把它開放出來，幫助每一個有相同困擾的人。我特別設計了<strong>「綠色代表營業、灰色代表休息」</strong>的功能，就是希望讓找餐廳這件事變簡單。</p>
                 </div>
-                
-                <hr class="story-divider">
-                
-                <div class="story-text-en">
-                    <p>I'm a non-vegetarian, and I fell in love with a partner who is a lacto-ovo vegetarian. It used to be incredibly hard for us to find a restaurant where we could eat happily together. Vegetarian individuals face a real challenge trying to dine with non-vegetarians, simply looking for a place to share a meal and spend quality time together.</p>
-                    <p>I know the deep frustration of hunting for a spot, especially when traveling in the middle of nowhere, having to click restaurants one by one just to check their hours. That's why I created this map—using <strong>Green for Open and Light Grey for Closed</strong> to make it effortless.</p>
-                    <p>I have built and maintained this map for a few years, and now I hope to share it to help everyone who needs it. Just to make spending time together easier.</p>
+                <div class="story-en">
+                    <p>I'm a non-vegetarian, and I fell in love with a partner who is a lacto-ovo vegetarian. It used to be incredibly hard for us to find a restaurant where we could eat happily together. </p>
+                    <p>I know the deep frustration of hunting for a spot, especially when traveling in the middle of nowhere, having to click restaurants one by one just to check their hours. </p>
+                    <p>That's why I created this map—using <strong>Green for Open and Light Grey for Closed</strong> to make it effortless. I have built and maintained this map for a few years, and now I hope to share it to help everyone who needs it. Just to make spending time together easier.</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- 3. Recent Shared Posts Section -->
-    <section class="recent-shares-section">
-        <div class="section-container">
-            <div class="section-title-area">
-                <h2>最新社群推薦 ｜ Recent Shared Spots</h2>
-                <p>感謝大家熱心填空！看看最近有哪些新加入的口袋名單：</p>
-            </div>
-            
-            <div class="shares-grid">
-                <!-- Share Item 1 -->
-                <div class="share-post-card">
-                    <div class="post-user">👤 來自美食探險家 Allen 的分享</div>
-                    <h4>大自然蔬食廚房</h4>
-                    <p class="post-comment">「這家的打拋豬有分葷食和未來肉版本，調味非常夠味，我和吃素的女友都超愛！」</p>
-                    <span class="post-tag">#高雄美食</span>
+        <!-- 3. Recent Shared Posts Grid -->
+        <section class="block-section">
+            <div class="block-badge">📣 RECENT SHARES / 最新推薦</div>
+            <div class="grid-two-columns">
+                <div class="post-card">
+                    <div class="card-user">👤 Allen 的分享</div>
+                    <h3>大自然蔬食廚房</h3>
+                    <p>「這家的打拋豬有分葷食和未來肉版本，調味非常夠味，我和吃素的女友都超愛！」</p>
+                    <span class="card-tag">#高雄美食</span>
                 </div>
-                
-                <!-- Share Item 2 -->
-                <div class="share-post-card">
-                    <div class="post-user">👤 來自貼心隊友 Emily 的分享</div>
-                    <h4>綠意Pasta義式餐廳</h4>
-                    <p class="post-comment">「全店的義大利麵都可以做成葷食或五辛素/蛋奶素，環境很漂亮，適合約會！」</p>
-                    <span class="post-tag">#台北聚餐</span>
+                <div class="post-card">
+                    <div class="card-user">👤 Emily 的分享</div>
+                    <h3>綠意Pasta義式餐廳</h3>
+                    <p>「全店的義大利麵都可以做成葷食或五辛素/蛋奶素，環境很漂亮，適合約會！」</p>
+                    <span class="card-tag">#台北聚餐</span>
                 </div>
             </div>
-            
-            <div class="center-btn">
-                <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="btn btn-secondary">＋ 我也想推薦我的愛店 Join & Contribute</a>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- 4. Nearby / Quick View Section -->
-    <section class="nearby-section">
-        <div class="section-container">
-            <div class="section-title-area">
-                <h2>精選聚餐餐廳 ｜ Quick View Spots</h2>
-                <p>快速瀏覽熱門推薦，點擊卡片可前往地圖查看詳情：</p>
-            </div>
-
-            <div class="restaurant-grid">
-                <!-- Restaurant 1 -->
-                <div class="restaurant-card">
-                    <div class="res-img-placeholder">📸 融心-舒芙蕾 店面外觀</div>
-                    <div class="res-info">
-                        <span class="res-type-badge">咖啡廳 Cafe</span>
-                        <h3>融心-舒芙蕾</h3>
-                        <div class="res-diet-tags">
-                            <span class="diet-tag badge-friendly">葷素共食 Friendly</span>
-                            <span class="diet-tag badge-lacto">蛋奶素 Lacto-Ovo</span>
+        <!-- 4. Quick View Gallery -->
+        <section class="block-section">
+            <div class="block-badge">📸 QUICK VIEW / 精選聚餐餐廳</div>
+            <div class="grid-two-columns">
+                <div class="restaurant-box">
+                    <div class="image-placeholder">📸 融心-舒芙蕾 店面外觀</div>
+                    <div class="box-details">
+                        <h4>融心-舒芙蕾</h4>
+                        <div class="tags-row">
+                            <span class="tag friendly">葷素共食 Friendly</span>
+                            <span class="tag lacto">蛋奶素 Lacto-Ovo</span>
                         </div>
                     </div>
                 </div>
-
-                <!-- Restaurant 2 -->
-                <div class="restaurant-card">
-                    <div class="res-img-placeholder">📸 陽光小廚 菜色照</div>
-                    <div class="res-info">
-                        <span class="res-type-badge">美式餐廳 Diner</span>
-                        <h3>陽光小廚 Sunny Kitchen</h3>
-                        <div class="res-diet-tags">
-                            <span class="diet-tag badge-friendly">葷素共食 Friendly</span>
-                            <span class="diet-tag badge-vegan">純素可 Vegan Opt</span>
+                <div class="restaurant-box">
+                    <div class="image-placeholder">📸 陽光小廚 菜色照</div>
+                    <div class="box-details">
+                        <h4>陽光小廚 Sunny Kitchen</h4>
+                        <div class="tags-row">
+                            <span class="tag friendly">葷素共食 Friendly</span>
+                            <span class="tag vegan">純素可 Vegan Opt</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Footer Call to Action -->
+        <footer class="site-footer">
+            <p>想讓這張地圖更完整嗎？歡迎加入我們！</p>
+            <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="main-btn btn-orange">＋ 我也想推薦我的愛店 Join & Contribute</a>
+        </footer>
+
+    </div>
 
 </body>
 </html>
