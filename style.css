@@ -1,117 +1,100 @@
-/* --- Bobbin Neo-Brutalist Theme Variables --- */
-:root {
-    --bg-canvas: #fcf9f2;       /* Warm, high-end organic cream backdrop */
-    --box-bg: #ffffff;
-    --stroke-dark: #111111;     /* Thick, heavy modern borders */
-    --text-dark: #111111;
-    --text-muted: #555555;
-    
-    /* Soft Pastel Accent Colors */
-    --pastel-green: #b2dfdb;
-    --pastel-orange: #ffe0b2;
-    --pastel-accent: #e8f5e9;
-}
-
-/* Base Document Reset */
-body {
+/* --- 基礎重設 --- */
+* {
+    box-sizing: border-box;
     margin: 0;
-    padding: 60px 20px;
-    background-color: var(--bg-canvas);
-    font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
-    color: var(--text-dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 0;
 }
 
-/* The Main Centered Board Canvas */
-.bobbin-container {
-    max-width: 960px;
+body {
+    background-color: #0b0c10; /* 深色底，符合大圖質感 */
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    color: #ffffff;
+}
+
+/* --- 滿版背景主視覺 --- */
+.hero-fullscreen {
+    position: relative;
     width: 100%;
-    background-color: var(--box-bg);
-    border: 3px solid var(--stroke-dark);
-    border-radius: 24px;
-    box-shadow: 10px 10px 0px var(--stroke-dark); /* Crisp, un-blurred flat shadow */
-    overflow: hidden;
+    height: 90vh; /* 佔據螢幕 90% 的高度，非常大器 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 讓文字絕對置中 */
+    align-items: center;
+    
+    /* 背景圖片設定：這裡使用了極具質感的暗色蔬菜大圖作為範例 */
+    /* linear-gradient 就是那層黑色的半透明保護濾鏡，讓白字更清晰 */
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), 
+                url('https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1800') no-repeat center center;
+    background-size: cover;
 }
 
-/* Navbar */
-.navbar {
+/* --- 透明導覽列 --- */
+.transparent-navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 40px;
-    border-bottom: 3px solid var(--stroke-dark);
+    padding: 30px 60px;
+    z-index: 10;
 }
-.brand { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
-.brand-badge { font-size: 11px; background: var(--text-dark); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; }
-.menu { display: flex; align-items: center; gap: 24px; }
-.menu-link { text-decoration: none; color: var(--text-dark); font-weight: 700; font-size: 15px; }
-.menu-link.active { text-decoration: underline; text-underline-offset: 6px; }
-.menu-btn { text-decoration: none; background: var(--text-dark); color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 14px; transition: transform 0.1s; }
-.menu-btn:hover { transform: translateY(-2px); }
 
-/* Hero Section */
-.hero {
-    padding: 80px 40px;
+.nav-logo {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 40px;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #ffffff; /* 滑鼠移過去或作用中變成純白 */
+}
+
+/* --- 置中巨型文字 --- */
+.hero-center-content {
     text-align: center;
-    border-bottom: 3px solid var(--stroke-dark);
-    background: radial-gradient(circle at 90% 10%, #f9f6f0 0%, transparent 40%);
+    padding: 0 20px;
 }
-.announcement-tag { display: inline-block; background: var(--pastel-accent); border: 2px solid var(--stroke-dark); padding: 5px 14px; border-radius: 30px; font-size: 13px; font-weight: 700; margin-bottom: 24px; }
-.hero h1 { font-size: 46px; font-weight: 900; line-height: 1.25; margin: 0 0 24px 0; letter-spacing: -1.5px; }
-.marker-highlight { background: #fff59d; padding: 0 6px; border-radius: 4px; }
-.subtitle { font-size: 18px; line-height: 1.7; color: var(--text-muted); max-width: 680px; margin: 0 auto 40px auto; font-weight: 500; }
 
-/* Action Buttons with Hard Shadow Blocks */
-.button-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-.action-button {
-    text-decoration: none; color: var(--text-dark); font-weight: 800; font-size: 16px;
-    padding: 16px 32px; border-radius: 16px; border: 3px solid var(--stroke-dark);
-    box-shadow: 4px 4px 0px var(--stroke-dark); transition: all 0.1s;
+.giant-title {
+    font-size: 100px; /* 超大粗體字，完美複製 image_bd3ae2.jpg 的震撼感 */
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 20px;
 }
-.action-button:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--stroke-dark); }
-.btn-green { background-color: var(--pastel-green); }
-.btn-orange { background-color: var(--pastel-orange); }
 
-/* Real-time Indicator Bar Strip */
-.status-ticker { display: flex; justify-content: center; gap: 40px; background: #faf8f5; padding: 16px; border-bottom: 3px solid var(--stroke-dark); font-weight: 700; font-size: 14px; }
-.ticker-item { display: flex; align-items: center; gap: 8px; }
-.indicator-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--stroke-dark); }
-.indicator-dot.open { background-color: #2e7d32; }
-.indicator-dot.closed { background-color: #b0bec5; }
+.elegant-subtitle {
+    font-family: 'Playfair Display', 'Noto Sans TC', serif;
+    font-style: italic; /* 優雅的斜體襯線字 */
+    font-size: 32px;
+    color: rgba(255, 255, 255, 0.9);
+}
 
-/* Grid Sections */
-.grid-section { display: grid; grid-template-columns: 1.1fr 0.9fr; border-bottom: 3px solid var(--stroke-dark); }
-.content-box { padding: 40px; position: relative; }
-.story-box { border-right: 3px solid var(--stroke-dark); }
-.box-label { display: inline-block; font-size: 11px; font-weight: 800; tracking: 1px; background: var(--stroke-dark); color: #fff; padding: 2px 8px; border-radius: 4px; margin-bottom: 16px; }
-.content-box h2 { font-size: 26px; font-weight: 900; margin: 0 0 20px 0; letter-spacing: -0.5px; }
-.story-box p { font-size: 15px; line-height: 1.8; color: #333; margin-bottom: 16px; font-weight: 500; }
-
-/* Mini Cards inside Previews */
-.mini-restaurant-card { display: flex; gap: 16px; background: #fff; border: 2px solid var(--stroke-dark); padding: 12px; border-radius: 14px; margin-bottom: 16px; box-shadow: 3px 3px 0px var(--stroke-dark); }
-.card-img-alt { width: 90px; height: 70px; background: #e0f2f1; border-radius: 8px; border: 2px solid var(--stroke-dark); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #666; text-align: center; font-weight: 700; }
-.card-meta h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 800; }
-.badge-row { display: flex; gap: 6px; }
-.tag-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--stroke-dark); }
-.tag-badge.friendly { background-color: #c8e6c9; }
-.tag-badge.lacto { background-color: #ffe0b2; }
-.tag-badge.vegan { background-color: #b3e5fc; }
-
-/* Footer Call to Action Block */
-.footer-cta { padding: 60px 40px; text-align: center; background-color: #fffdf9; }
-.footer-cta h2 { font-size: 32px; font-weight: 900; margin: 0 0 16px 0; }
-.footer-cta p { font-size: 16px; color: var(--text-muted); margin-bottom: 32px; font-weight: 500; }
-
-/* Full Responsiveness for Mobile Screens */
+/* RWD 手機板彈性調整 */
 @media (max-width: 768px) {
-    body { padding: 12px; }
-    .navbar { padding: 20px; }
-    .hero { padding: 60px 20px; }
-    .hero h1 { font-size: 32px; }
-    .status-ticker { flex-direction: column; gap: 12px; align-items: center; }
-    .grid-section { grid-template-columns: 1fr; }
-    .story-box { border-right: none; border-bottom: 3px solid var(--stroke-dark); }
-    .content-box { padding: 30px 20px; }
+    .transparent-navbar {
+        padding: 24px 30px;
+    }
+    .giant-title {
+        font-size: 55px;
+    }
+    .elegant-subtitle {
+        font-size: 22px;
+    }
 }
