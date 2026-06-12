@@ -119,4 +119,3 @@ body {
     .action-grid, .story-grid, .grid-two-columns { grid-template-columns: 1fr; gap: 20px; }
     .story-en { border-left: none; padding-left: 0; border-top: 2px dashed #ccc; padding-top: 20px; }
     .status-legend-bar { flex-direction: column; gap: 8px; align-items: center; }
-}
