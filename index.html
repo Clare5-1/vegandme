@@ -37,7 +37,7 @@
             </div>
         </header>
 
-        <!-- 底部俐落的行動呼籲按鈕 (不干擾中間的美味菜色與自帶文字) -->
+        <!-- 底部行動呼籲按鈕 -->
         <div class="hero-bottom-actions">
             <a href="map.html" class="cta-pill-btn">
                 <span class="lang-zh">🔍 進入共食地圖</span>
@@ -66,19 +66,17 @@
         </div>
     </section>
 
-    <!-- 控制語言切換的極輕量 JavaScript 語法 -->
+    <!-- 控制語言切換的 JavaScript 語法 -->
     <script>
         const btnZh = document.getElementById('btn-zh');
         const btnEn = document.getElementById('btn-en');
         
-        // 切換到中文
         btnZh.addEventListener('click', () => {
             document.body.classList.remove('en-mode');
             btnZh.classList.add('active');
             btnEn.classList.remove('active');
         });
         
-        // 切換到英文
         btnEn.addEventListener('click', () => {
             document.body.classList.add('en-mode');
             btnEn.classList.add('active');
