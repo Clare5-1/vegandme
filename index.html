@@ -3,93 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veg&Me Map</title>
-    <!-- 引入高質感的現代粗體字與優雅的斜體襯線字 -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800;900&family=Playfair+Display:ital,wght@1,500&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet">
+    <title>Veg&Me Map ｜ 葷素共食地圖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 第一階段：滿版電影感主視覺區塊 -->
+    <!-- 滿版電影感主視覺區塊 -->
     <section class="hero-fullscreen">
         
-        <!-- 透明頂部導覽列 (對齊 image_bd3ae2.jpg 佈局) -->
+        <!-- 頂部導覽列 -->
         <header class="transparent-navbar">
             <div class="nav-logo">VEG & ME</div>
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-item active">Home</a>
-                <a href="map.html" class="nav-item">Map</a>
-            </nav>
+            
+            <div class="nav-right-group">
+                <nav class="nav-menu">
+                    <a href="index.html" class="nav-item active">
+                        <span class="lang-zh">首頁</span>
+                        <span class="lang-en">Home</span>
+                    </a>
+                    <a href="map.html" class="nav-item">
+                        <span class="lang-zh">地圖</span>
+                        <span class="lang-en">Map</span>
+                    </a>
+                </nav>
+                
+                <!-- 右上角語言切換器 (Language Switcher) -->
+                <div class="language-switcher">
+                    <button id="btn-zh" class="lang-btn active">繁中</button>
+                    <span class="divider">|</span>
+                    <button id="btn-en" class="lang-btn">EN</button>
+                </div>
+            </div>
         </header>
 
-        <!-- 置中大標題文字區塊 -->
-        <div class="hero-center-content">
-            <h1 class="giant-title">VEG & ME</h1>
-            <p class="elegant-subtitle">葷素共食地圖</p>
+        <!-- 底部俐落的行動呼籲按鈕 (不干擾中間的美味菜色與自帶文字) -->
+        <div class="hero-bottom-actions">
+            <a href="map.html" class="cta-pill-btn">
+                <span class="lang-zh">🔍 進入共食地圖</span>
+                <span class="lang-en">🔍 Explore the Map</span>
+            </a>
         </div>
 
     </section>
 
-    <!-- 接下來的其他區塊我們會一步步往下加... -->
-
-</body>
-</html>
-
-        <!-- Open/Closed Real-time Indicator Bar -->
-        <div class="status-ticker">
-            <div class="ticker-item"><span class="indicator-dot open"></span> 綠色標記 = 營業中，放心出發</div>
-            <div class="ticker-item"><span class="indicator-dot closed"></span> 灰色標記 = 已休息，下次再去</div>
-        </div>
-
-        <!-- Two-Column Layout: Story & Features -->
-        <section class="grid-section">
+    <!-- 網頁底部的故事細節區塊 -->
+    <section class="intro-section">
+        <div class="container-narrow">
+            <div class="lang-zh">
+                <p class="story-text">
+                    我知道那種在路上找不到店、甚至在旅遊時必須一家家點開 Google Map 確認營業時間的挫折感。這張地圖我默默經營了幾年，現在決定完全公開，希望讓找餐廳這件事，變得更簡單、更直覺。
+                </p>
+                <a href="https://forms.gle/SJYtRv7sgkdFNUBt5" target="_blank" class="form-link-btn">✍️ 分享你的口袋名單 ➔</a>
+            </div>
             
-            <!-- Left: The Story -->
-            <div class="content-box story-box">
-                <span class="box-label">OUR STORY</span>
-                <h2>為什麼建立這個網站？</h2>
-                <p>我本身不吃素，但我深深愛著一位吃蛋奶素的伴侶。過去，我們常常為了找到一家能讓兩個人都開心吃飽、坐下來好好享受時光的餐廳而傷透腦筋。</p>
-                <p>我知道那種在路上找不到店、甚至在旅遊時必須一家家點開 Google Map 確認到底是開是關的挫折感。這張地圖我經營了幾年，現在決定完全公開，希望讓找餐廳這件事，變得更簡單、更直覺。</p>
+            <div class="lang-en">
+                <p class="story-text">
+                    I know the deep frustration of hunting for a dining spot, having to click restaurants one by one just to check their real-time hours. This shared map is a personal project I've built over the years, and now I'm making it fully public to help everyone find food hassle-free.
+                </p>
+                <a href="https://forms.gle/SJYtRv7sgkdFNUBt5" target="_blank" class="form-link-btn">✍️ Share Your Recommendations ➔</a>
             </div>
+        </div>
+    </section>
 
-            <!-- Right: Quick Previews -->
-            <div class="content-box preview-box">
-                <span class="box-label">QUICK VIEW</span>
-                <h2>精選聚餐口袋名單</h2>
-                
-                <div class="mini-restaurant-card">
-                    <div class="card-img-alt">📸 融心-舒芙蕾</div>
-                    <div class="card-meta">
-                        <h3>融心-舒芙蕾</h3>
-                        <div class="badge-row">
-                            <span class="tag-badge friendly">葷素共食</span>
-                            <span class="tag-badge lacto">蛋奶素</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mini-restaurant-card">
-                    <div class="card-img-alt">📸 陽光小廚 Sunny Kitchen</div>
-                    <div class="card-meta">
-                        <h3>陽光小廚 Sunny Kitchen</h3>
-                        <div class="badge-row">
-                            <span class="tag-badge friendly">葷素共食</span>
-                            <span class="tag-badge vegan">純素可</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- Community Call to Action Footer -->
-        <footer class="footer-cta">
-            <h2>真心需要你的加入！</h2>
-            <p>地圖的空位，靠大家一起填滿。如果你也有私藏的葷素共食愛店，歡迎點擊下方分享！</p>
-            <a href="https://forms.gle/SJYtRv7sgkdFNUBt5" target="_blank" class="action-button btn-orange">＋ 馬上推薦我的口袋名單</a>
-        </footer>
-
-    </div>
+    <!-- 控制語言切換的極輕量 JavaScript 語法 -->
+    <script>
+        const btnZh = document.getElementById('btn-zh');
+        const btnEn = document.getElementById('btn-en');
+        
+        // 切換到中文
+        btnZh.addEventListener('click', () => {
+            document.body.classList.remove('en-mode');
+            btnZh.classList.add('active');
+            btnEn.classList.remove('active');
+        });
+        
+        // 切換到英文
+        btnEn.addEventListener('click', () => {
+            document.body.classList.add('en-mode');
+            btnEn.classList.add('active');
+            btnZh.classList.remove('active');
+        });
+    </script>
 
 </body>
 </html>
