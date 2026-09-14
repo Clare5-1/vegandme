@@ -737,132 +737,71 @@
                 .replace(/'/g, "&#039;");
         }
 
+        function translateCategory(code) {
 
-        function translateDietary(tag) {
-
-    if (!tag) {
-        return {
-            category: "unknown",
-            label: "Vegetarian"
-        };
-    }
-
-    const t = tag
-        .toUpperCase()
-        .trim();
-
-
-    /* Pure Vegan */
-
-    if (
-        t === "V" ||
-        t === "VEGAN" ||
-        t.includes("PURE VEGAN") ||
-        t.includes("純素") ||
-        t.includes("全素")
-    ) {
-        return {
-            category: "vegan",
-            label: "🌱 Pure Vegan · 全素"
-        };
-    }
-
-
-    /* Lacto-Ovo */
-
-    if (
-        t === "VO" ||
-        t.includes("LACTO-OVO") ||
-        t.includes("OVO-LACTO") ||
-        t.includes("LACTO OVO") ||
-        t.includes("蛋奶素")
-    ) {
-        return {
-            category: "lacto-ovo",
-            label: "🥚 Lacto-Ovo · 蛋奶素"
-        };
-    }
-
-
-    /* No Alliums */
-
-    if (
-        t === "P" ||
-        t.includes("PUNGENT") ||
-        t.includes("NO ALLIUM") ||
-        t.includes("五辛") ||
-        t.includes("植物五辛")
-    ) {
-        return {
-            category: "no-alliums",
-            label: "🌿 No Alliums · 植物五辛素"
-        };
-    }
-
-
-    /* Dessert */
-
-    if (
-        t.includes("DESSERT") ||
-        t.includes("甜品") ||
-        t.includes("甜點")
-    ) {
-        return {
-            category: "dessert",
-            label: "🍰 Dessert · 甜品"
-        };
-    }
-
-
-    return {
-        category: "unknown",
-        label: escapeHTML(tag)
+    const categories = {
+        v: "🌱 Pure Vegan · 全素",
+        l: "🥚 Lacto-Ovo · 蛋奶素",
+        n: "🌿 No Alliums · 植物五辛素",
+        d: "🍰 Dessert · 甜品"
     };
+
+    return categories[code] || "";
+}
+
+
+function getCategoryCodes(value) {
+
+    if (!value) {
+        return [];
+    }
+
+    return value
+        .toLowerCase()
+        .split(",")
+        .map(code => code.trim())
+        .filter(code =>
+            ["v", "l", "n", "d"].includes(code)
+        );
 }
         
-        function translateShopType(type) {
-
-            if (!type) {
-                return "";
-            }
-
-            const t =
-                type.toUpperCase().trim();
-
-
-            if (
-                t === "PURE" ||
-                t === "P" ||
-                t.includes("純素")
-            ) {
-                return "100% Vegetarian";
-            }
-
-
-            if (
-                t === "FRIENDLY" ||
-                t === "F" ||
-                t.includes("葷素")
-            ) {
-                return "Vegetarian Friendly";
-            }
-
-
-            return escapeHTML(type);
-        }
-
-
         /* ==========================================
            OPENING HOURS
            ========================================== */
 
         function getOpenStatus(row) {
 
-            const openHour =
-                Number(row.OpenHour);
+            function timeToMinutes(value) {
 
-            const closeHour =
-                Number(row.CloseHour);
+            if (!value) {
+                return NaN;
+            }
+
+            const text = String(value).trim();
+
+            if (text.includes(":")) {
+
+            const [hours, minutes] =
+                text.split(":").map(Number);
+
+            if (
+                Number.isFinite(hours) &&
+                Number.isFinite(minutes)
+            ) {
+                return hours * 60 + minutes;
+            }
+
+            return NaN;
+            }
+
+            const hour = Number(text);
+
+            if (Number.isFinite(hour)) {
+            return hour * 60;
+            }
+
+            return NaN;
+            }
 
 
             if (
@@ -893,11 +832,23 @@
                 now.getMinutes();
 
 
-            const openMinutes =
-                openHour * 60;
+           const openMinutes =
+                timeToMinutes(row.OpenHour);
 
             const closeMinutes =
-                closeHour * 60;
+                timeToMinutes(row.CloseHour);
+
+
+            if (
+                !Number.isFinite(openMinutes) ||
+                !Number.isFinite(closeMinutes)
+            ) {
+
+            return {
+                isOpen: false,
+                known: false
+                };
+            }
 
 
             let isOpen;
@@ -988,20 +939,22 @@
                         : "Hours unavailable";
 
 
-                const name =
-                    row.Name ||
+               const name =
+                    row.Restaurant ||
                     "Vegetarian restaurant";
 
 
-                const dietary = translateDietary(
-                   row.Tag || row.Dietary
+                const categoryCodes =
+                    getCategoryCodes(
+                    row.Categories
                     );
 
 
-                const shopType =
-                    translateShopType(
-                        row.ShopType
-                    );
+                const categoryLabels =
+                    categoryCodes
+                    .map(code => translateCategory(code))
+                    .filter(Boolean)
+                    .join(" · ");
 
 
                 /*
@@ -1039,15 +992,26 @@
 
                         name,
 
-                        dietary: dietary.label,
+                        categories:
+                            categoryCodes.join(","),
 
-                        category: dietary.category,
+                        categoryLabels,
 
-                        shopType,
+                        hasVegan:
+                            categoryCodes.includes("v") ? 1 : 0,
+
+                        hasLactoOvo:
+                            categoryCodes.includes("l") ? 1 : 0,
+
+                        hasNoAlliums:
+                            categoryCodes.includes("n") ? 1 : 0,
+
+                        hasDessert:
+                            categoryCodes.includes("d") ? 1 : 0,
 
                         hours,
 
-                        isOpen:
+                       isOpen:
                             status.isOpen ? 1 : 0,
 
                         statusKnown:
@@ -1055,7 +1019,7 @@
 
                         googleMapsURL
 
-                    }
+}
 
                 });
             }
@@ -1504,14 +1468,6 @@
                 escapeHTML(properties.name);
 
 
-            const dietary =
-                properties.dietary;
-
-
-            const shopType =
-                properties.shopType;
-
-
             const hours =
                 escapeHTML(properties.hours);
 
@@ -1568,10 +1524,7 @@
                     </div>
 
                     <div class="restaurant-type">
-                        ${dietary}
-                        ${shopType
-                            ? ` · ${shopType}`
-                            : ""}
+                       ${escapeHTML(properties.categoryLabels || "Vegetarian")}
                     </div>
 
                     <div class="restaurant-hours">
@@ -1661,10 +1614,13 @@ categoryButtons.forEach(button => {
 
                 baseFilter,
 
-                [
-                    "==",
-                    ["get", "category"],
-                    selectedCategory
+               [
+                    "in",
+                    selectedCategory,
+                    [
+                    "get",
+                    "categories"
+                    ]
                 ]
             ];
         }
