@@ -1,3 +1,542 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+```
+<meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>veg&me | Vegetarian Map</title>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.css"
+/>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            sans-serif;
+    }
+
+
+    /* =========================
+       MAP
+       ========================= */
+
+    #map {
+        width: 100%;
+        height: 100dvh;
+    }
+
+
+    /* =========================
+       TOP BAR
+       ========================= */
+
+    .top-bar {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+
+        z-index: 10;
+
+        padding: 10px 14px;
+
+        background: rgba(255, 255, 255, 0.94);
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 3px 14px rgba(0, 0, 0, 0.12);
+
+        backdrop-filter: blur(8px);
+    }
+
+
+    /* =========================
+       TOP ROW
+       ========================= */
+
+    .top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    /* =========================
+       LOGO
+       ========================= */
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        color: #245c35;
+
+        font-size: 18px;
+        font-weight: 700;
+
+        letter-spacing: -0.3px;
+    }
+
+    .logo-mark {
+        width: 10px;
+        height: 10px;
+
+        border-radius: 50%;
+
+        background: #4caf50;
+    }
+
+
+    /* =========================
+       SEARCH BUTTON
+       ========================= */
+
+    .search-button {
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        border-radius: 50%;
+
+        background: #f2f6f3;
+
+        font-size: 16px;
+
+        cursor: pointer;
+    }
+
+
+    /* =========================
+       CATEGORY FILTERS
+       ========================= */
+
+    .category-row {
+        display: flex;
+
+        gap: 7px;
+
+        margin-top: 10px;
+
+        overflow-x: auto;
+
+        scrollbar-width: none;
+    }
+
+    .category-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-button {
+        flex: 0 0 auto;
+
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        padding: 8px 11px;
+
+        border: 1px solid #e2e8e3;
+
+        border-radius: 20px;
+
+        background: #ffffff;
+
+        color: #4b554e;
+
+        font-size: 12px;
+        font-weight: 600;
+
+        white-space: nowrap;
+
+        cursor: pointer;
+
+        transition:
+            background 0.15s ease,
+            color 0.15s ease,
+            border-color 0.15s ease,
+            transform 0.1s ease;
+    }
+
+    .category-button:hover {
+        border-color: #b9cbbd;
+    }
+
+    .category-button:active {
+        transform: scale(0.97);
+    }
+
+    .category-button.active {
+        background: #245c35;
+
+        border-color: #245c35;
+
+        color: white;
+    }
+
+
+    /* =========================
+       STATUS LEGEND
+       ========================= */
+
+    .legend {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        margin-top: 10px;
+
+        color: #555;
+
+        font-size: 12px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .legend-dot {
+        width: 9px;
+        height: 9px;
+
+        border-radius: 50%;
+    }
+
+    .legend-open {
+        background: #3fae5a;
+    }
+
+    .legend-closed {
+        background: #a7a7a7;
+    }
+
+
+    /* =========================
+       POPUP
+       ========================= */
+
+    .maplibregl-popup-content {
+        padding: 0;
+
+        width: min(290px, calc(100vw - 40px));
+
+        border-radius: 16px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 6px 25px rgba(0, 0, 0, 0.16);
+    }
+
+    .maplibregl-popup-close-button {
+        z-index: 2;
+
+        width: 34px;
+        height: 34px;
+
+        font-size: 22px;
+
+        color: #666;
+    }
+
+    .restaurant-card {
+        padding: 17px;
+    }
+
+    .restaurant-name {
+        padding-right: 20px;
+
+        color: #183c24;
+
+        font-size: 18px;
+        font-weight: 700;
+
+        line-height: 1.3;
+    }
+
+    .restaurant-type {
+        margin-top: 7px;
+
+        color: #555;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+    .restaurant-hours {
+        margin-top: 12px;
+
+        color: #444;
+
+        font-size: 13px;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+
+        margin-top: 10px;
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-open {
+        color: #236b36;
+        background: #e7f5eb;
+    }
+
+    .status-closed {
+        color: #666;
+        background: #eeeeee;
+    }
+
+    .google-button {
+        display: block;
+
+        margin-top: 15px;
+        padding: 11px 13px;
+
+        border-radius: 10px;
+
+        background: #245c35;
+        color: white;
+
+        text-align: center;
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       LOADING
+       ========================= */
+
+    .loading {
+        position: fixed;
+
+        left: 50%;
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        z-index: 20;
+
+        padding: 10px 15px;
+
+        border-radius: 12px;
+
+        background: rgba(255, 255, 255, 0.95);
+
+        box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.12);
+
+        color: #555;
+
+        font-size: 13px;
+
+        text-align: center;
+    }
+
+    .loading.hidden {
+        display: none;
+    }
+
+
+    /* =========================
+       MAP CONTROLS
+       ========================= */
+
+    .maplibregl-ctrl-group {
+        border: none;
+
+        border-radius: 12px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 3px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .maplibregl-ctrl button {
+        width: 42px;
+        height: 42px;
+    }
+
+
+    /* =========================
+       MOBILE
+       ========================= */
+
+    @media (max-width: 600px) {
+
+        .top-bar {
+            top: 10px;
+            left: 10px;
+            right: 10px;
+
+            padding: 9px 12px;
+        }
+
+        .logo {
+            font-size: 17px;
+        }
+
+        .legend {
+            font-size: 11px;
+        }
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<!-- =========================
+     TOP BAR
+     ========================= -->
+
+<div class="top-bar">
+
+    <div class="top-row">
+
+        <div class="logo">
+            <span class="logo-mark"></span>
+            veg&me
+        </div>
+
+        <button
+            id="search-button"
+            class="search-button"
+            aria-label="Search"
+        >
+            🔍
+        </button>
+
+    </div>
+
+
+    <div class="category-row">
+
+        <button
+            class="category-button active"
+            data-category="all"
+        >
+            🌱
+            <span>All</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="vegan"
+        >
+            🌱
+            <span>Pure Vegan</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="lacto-ovo"
+        >
+            🥚
+            <span>Lacto-Ovo</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="no-alliums"
+        >
+            🌿
+            <span>No Alliums</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="dessert"
+        >
+            🍰
+            <span>Dessert</span>
+        </button>
+
+    </div>
+
+
+    <div class="legend">
+
+        <div class="legend-item">
+            <span class="legend-dot legend-open"></span>
+            Open
+        </div>
+
+        <div class="legend-item">
+            <span class="legend-dot legend-closed"></span>
+            Closed
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MAP
+     ========================= -->
+
+<div id="map"></div>
+
+
+<!-- =========================
+     LOADING
+     ========================= -->
+
+<div id="loading" class="loading">
+    Loading map...
+</div>
+
+
+<!-- =========================
+     MAPLIBRE
+     ========================= -->
+
 <script type="module">
 
     import * as maplibregl from
@@ -37,7 +576,7 @@
 
 
     /* ==========================================
-       CONTROLS
+       MAP CONTROLS
        ========================================== */
 
     map.addControl(
@@ -71,7 +610,11 @@
         let insideQuotes = false;
 
 
-        for (let i = 0; i < text.length; i++) {
+        for (
+            let i = 0;
+            i < text.length;
+            i++
+        ) {
 
             const char = text[i];
 
@@ -94,7 +637,8 @@
 
             if (char === '"') {
 
-                insideQuotes = !insideQuotes;
+                insideQuotes =
+                    !insideQuotes;
 
                 continue;
             }
@@ -114,7 +658,8 @@
 
 
             if (
-                (char === "\n" || char === "\r") &&
+                (char === "\n" ||
+                 char === "\r") &&
                 !insideQuotes
             ) {
 
@@ -125,6 +670,7 @@
 
                     i++;
                 }
+
 
                 row.push(value);
 
@@ -167,11 +713,14 @@
 
         return rows
             .slice(1)
+
             .filter(row =>
                 row.some(
-                    cell => cell.trim() !== ""
+                    cell =>
+                        cell.trim() !== ""
                 )
             )
+
             .map(row => {
 
                 const object = {};
@@ -181,7 +730,10 @@
                     (header, index) => {
 
                         object[header] =
-                            (row[index] || "").trim();
+                            (
+                                row[index] ||
+                                ""
+                            ).trim();
 
                     }
                 );
@@ -243,11 +795,18 @@
 
 
         return String(value)
+
             .toLowerCase()
+
             .split(",")
-            .map(code => code.trim())
+
+            .map(code =>
+                code.trim()
+            )
+
             .filter(code =>
-                ["v", "l", "n", "d"].includes(code)
+                ["v", "l", "n", "d"]
+                    .includes(code)
             );
 
     }
@@ -269,14 +828,6 @@
             String(value).trim();
 
 
-        /*
-         * Supports:
-         *
-         * 11
-         * 11:00
-         * 11:30
-         */
-
         if (text.includes(":")) {
 
             const parts =
@@ -296,7 +847,10 @@
                 Number.isFinite(minutes)
             ) {
 
-                return hours * 60 + minutes;
+                return (
+                    hours * 60 +
+                    minutes
+                );
             }
 
 
@@ -332,11 +886,6 @@
             String(value).trim();
 
 
-        /*
-         * Already formatted:
-         * 11:00
-         */
-
         if (text.includes(":")) {
 
             const parts =
@@ -356,19 +905,21 @@
                 Number.isFinite(minutes)
             ) {
 
-                return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-
+                return (
+                    String(hours)
+                        .padStart(2, "0")
+                    +
+                    ":"
+                    +
+                    String(minutes)
+                        .padStart(2, "0")
+                );
             }
 
 
             return text;
         }
 
-
-        /*
-         * Simple hour:
-         * 11 → 11:00
-         */
 
         const hour =
             Number(text);
@@ -378,7 +929,12 @@
             Number.isFinite(hour)
         ) {
 
-            return `${String(hour).padStart(2, "0")}:00`;
+            return (
+                String(hour)
+                    .padStart(2, "0")
+                +
+                ":00"
+            );
         }
 
 
@@ -393,16 +949,16 @@
     function getOpenStatus(row) {
 
         const openMinutes =
-            timeToMinutes(row.OpenHour);
+            timeToMinutes(
+                row.OpenHour
+            );
 
 
         const closeMinutes =
-            timeToMinutes(row.CloseHour);
+            timeToMinutes(
+                row.CloseHour
+            );
 
-
-        /*
-         * No valid opening hours
-         */
 
         if (
             !Number.isFinite(openMinutes) ||
@@ -420,10 +976,11 @@
 
 
         /*
-         * Browser local time for prototype.
+         * Prototype:
+         * Uses the visitor's browser time.
          *
-         * Later we can make this restaurant
-         * timezone-aware for worldwide use.
+         * Later we can make this
+         * restaurant-timezone aware.
          */
 
         const now =
@@ -445,12 +1002,15 @@
          */
 
         if (
-            closeMinutes > openMinutes
+            closeMinutes >
+            openMinutes
         ) {
 
             isOpen =
-                currentMinutes >= openMinutes &&
-                currentMinutes < closeMinutes;
+                currentMinutes >=
+                    openMinutes &&
+                currentMinutes <
+                    closeMinutes;
 
         }
 
@@ -464,8 +1024,10 @@
         else {
 
             isOpen =
-                currentMinutes >= openMinutes ||
-                currentMinutes < closeMinutes;
+                currentMinutes >=
+                    openMinutes ||
+                currentMinutes <
+                    closeMinutes;
 
         }
 
@@ -493,11 +1055,15 @@
         for (const row of rows) {
 
             const latitude =
-                Number(row.Latitude);
+                Number(
+                    row.Latitude
+                );
 
 
             const longitude =
-                Number(row.Longitude);
+                Number(
+                    row.Longitude
+                );
 
 
             /*
@@ -531,11 +1097,15 @@
                ============================== */
 
             const openTime =
-                formatTime(row.OpenHour);
+                formatTime(
+                    row.OpenHour
+                );
 
 
             const closeTime =
-                formatTime(row.CloseHour);
+                formatTime(
+                    row.CloseHour
+                );
 
 
             const hours =
@@ -548,7 +1118,7 @@
 
 
             /* ==============================
-               RESTAURANT NAME
+               NAME
                ============================== */
 
             const name =
@@ -568,10 +1138,13 @@
 
             const categoryLabels =
                 categoryCodes
+
                     .map(code =>
                         translateCategory(code)
                     )
+
                     .filter(Boolean)
+
                     .join(" · ");
 
 
@@ -652,870 +1225,4 @@
                 }
 
             });
-
-        }
-
-
-        return {
-
-            type: "FeatureCollection",
-
-            features
-
-        };
-
-    }
-
-
-    /* ==========================================
-       LOAD RESTAURANTS
-       ========================================== */
-
-    async function loadRestaurants() {
-
-        try {
-
-            const response =
-                await fetch(
-                    GOOGLE_SHEET_CSV,
-                    {
-                        cache: "no-store"
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Could not load restaurant data."
-                );
-
-            }
-
-
-            const csv =
-                await response.text();
-
-
-            const rows =
-                parseCSV(csv);
-
-
-            console.log(
-                "Google Sheet rows:",
-                rows
-            );
-
-
-            const geojson =
-                createGeoJSON(rows);
-
-
-            console.log(
-                "Restaurants loaded:",
-                geojson.features.length
-            );
-
-
-            /* ==================================
-               GEOJSON SOURCE
-               ================================== */
-
-            map.addSource(
-                "restaurants",
-                {
-
-                    type: "geojson",
-
-                    data: geojson,
-
-                    cluster: true,
-
-                    clusterMaxZoom: 13,
-
-                    clusterRadius: 50
-
-                }
-            );
-
-
-            /* ==================================
-               CLUSTERS
-               ================================== */
-
-            map.addLayer({
-
-                id: "restaurant-clusters",
-
-                type: "circle",
-
-                source: "restaurants",
-
-                filter: [
-                    "has",
-                    "point_count"
-                ],
-
-                paint: {
-
-                    "circle-color":
-                        "#245c35",
-
-                    "circle-radius": [
-
-                        "step",
-
-                        [
-                            "get",
-                            "point_count"
-                        ],
-
-                        18,
-
-                        10,
-                        22,
-
-                        50,
-                        28
-
-                    ],
-
-                    "circle-stroke-width": 2,
-
-                    "circle-stroke-color":
-                        "#ffffff"
-
-                }
-
-            });
-
-
-            /* ==================================
-               CLUSTER NUMBER
-               ================================== */
-
-            map.addLayer({
-
-                id:
-                    "restaurant-cluster-count",
-
-                type: "symbol",
-
-                source: "restaurants",
-
-                filter: [
-                    "has",
-                    "point_count"
-                ],
-
-                layout: {
-
-                    "text-field": [
-                        "get",
-                        "point_count_abbreviated"
-                    ],
-
-                    "text-size": 12
-
-                },
-
-                paint: {
-
-                    "text-color":
-                        "#ffffff"
-
-                }
-
-            });
-
-
-            /* ==================================
-               OPEN RESTAURANTS
-               ================================== */
-
-            map.addLayer({
-
-                id:
-                    "restaurant-open",
-
-                type: "circle",
-
-                source:
-                    "restaurants",
-
-                filter: [
-
-                    "all",
-
-                    [
-                        "!",
-                        [
-                            "has",
-                            "point_count"
-                        ]
-                    ],
-
-                    [
-                        "==",
-                        [
-                            "get",
-                            "isOpen"
-                        ],
-                        1
-                    ]
-
-                ],
-
-                paint: {
-
-                    "circle-radius": 7,
-
-                    "circle-color":
-                        "#3fae5a",
-
-                    "circle-stroke-width":
-                        2,
-
-                    "circle-stroke-color":
-                        "#ffffff",
-
-                    "circle-opacity":
-                        0.95
-
-                }
-
-            });
-
-
-            /* ==================================
-               CLOSED RESTAURANTS
-               ================================== */
-
-            map.addLayer({
-
-                id:
-                    "restaurant-closed",
-
-                type: "circle",
-
-                source:
-                    "restaurants",
-
-                filter: [
-
-                    "all",
-
-                    [
-                        "!",
-                        [
-                            "has",
-                            "point_count"
-                        ]
-                    ],
-
-                    [
-                        "==",
-                        [
-                            "get",
-                            "isOpen"
-                        ],
-                        0
-                    ]
-
-                ],
-
-                paint: {
-
-                    "circle-radius": 6,
-
-                    "circle-color":
-                        "#a7a7a7",
-
-                    "circle-stroke-width":
-                        2,
-
-                    "circle-stroke-color":
-                        "#ffffff",
-
-                    "circle-opacity":
-                        0.85
-
-                }
-
-            });
-
-
-            /* ==================================
-               CLUSTER CLICK
-               ================================== */
-
-            map.on(
-                "click",
-                "restaurant-clusters",
-                async event => {
-
-                    const features =
-                        map.queryRenderedFeatures(
-                            event.point,
-                            {
-                                layers: [
-                                    "restaurant-clusters"
-                                ]
-                            }
-                        );
-
-
-                    if (!features.length) {
-
-                        return;
-                    }
-
-
-                    const clusterId =
-                        features[0]
-                            .properties
-                            .cluster_id;
-
-
-                    const source =
-                        map.getSource(
-                            "restaurants"
-                        );
-
-
-                    const zoom =
-                        await source
-                            .getClusterExpansionZoom(
-                                clusterId
-                            );
-
-
-                    map.easeTo({
-
-                        center:
-                            features[0]
-                                .geometry
-                                .coordinates,
-
-                        zoom
-
-                    });
-
-                }
-            );
-
-
-            /* ==================================
-               RESTAURANT CLICK
-               ================================== */
-
-            map.on(
-                "click",
-                "restaurant-open",
-                showRestaurant
-            );
-
-
-            map.on(
-                "click",
-                "restaurant-closed",
-                showRestaurant
-            );
-
-
-            /* ==================================
-               CURSOR
-               ================================== */
-
-            map.on(
-                "mouseenter",
-                "restaurant-open",
-                () => {
-
-                    map.getCanvas()
-                        .style.cursor =
-                        "pointer";
-
-                }
-            );
-
-
-            map.on(
-                "mouseleave",
-                "restaurant-open",
-                () => {
-
-                    map.getCanvas()
-                        .style.cursor =
-                        "";
-
-                }
-            );
-
-
-            map.on(
-                "mouseenter",
-                "restaurant-closed",
-                () => {
-
-                    map.getCanvas()
-                        .style.cursor =
-                        "pointer";
-
-                }
-            );
-
-
-            map.on(
-                "mouseleave",
-                "restaurant-closed",
-                () => {
-
-                    map.getCanvas()
-                        .style.cursor =
-                        "";
-
-                }
-            );
-
-
-            /* ==================================
-               HIDE LOADING
-               ================================== */
-
-            loading.classList.add(
-                "hidden"
-            );
-
-
-            /* ==================================
-               FIT MAP
-               ================================== */
-
-            if (
-                geojson.features.length > 0
-            ) {
-
-                const bounds =
-                    new maplibregl.LngLatBounds();
-
-
-                for (
-                    const feature
-                    of geojson.features
-                ) {
-
-                    bounds.extend(
-                        feature
-                            .geometry
-                            .coordinates
-                    );
-
-                }
-
-
-                map.fitBounds(
-                    bounds,
-                    {
-
-                        padding: {
-
-                            top: 160,
-
-                            bottom: 80,
-
-                            left: 40,
-
-                            right: 40
-
-                        },
-
-                        maxZoom: 13,
-
-                        duration: 800
-
-                    }
-                );
-
-            }
-
-
-        } catch (error) {
-
-            console.error(
-                "Restaurant loading error:",
-                error
-            );
-
-
-            loading.textContent =
-                "Unable to load restaurant data.";
-
-        }
-
-    }
-
-
-    /* ==========================================
-       RESTAURANT POPUP
-       ========================================== */
-
-    function showRestaurant(event) {
-
-        const feature =
-            event.features[0];
-
-
-        const properties =
-            feature.properties;
-
-
-        const name =
-            escapeHTML(
-                properties.name
-            );
-
-
-        const hours =
-            escapeHTML(
-                properties.hours
-            );
-
-
-        const categories =
-            escapeHTML(
-                properties.categoryLabels ||
-                "Vegetarian"
-            );
-
-
-        const isOpen =
-            Number(
-                properties.isOpen
-            ) === 1;
-
-
-        const statusKnown =
-            Number(
-                properties.statusKnown
-            ) === 1;
-
-
-        let statusHTML = "";
-
-
-        if (statusKnown) {
-
-            statusHTML = isOpen
-
-                ? `
-                    <div class="status status-open">
-                        ● Open now
-                    </div>
-                  `
-
-                : `
-                    <div class="status status-closed">
-                        ● Closed
-                    </div>
-                  `;
-
-        }
-
-
-        let googleButton = "";
-
-
-        if (
-            properties.googleMapsURL
-        ) {
-
-            const safeURL =
-                String(
-                    properties.googleMapsURL
-                )
-                .replace(/"/g, "&quot;");
-
-
-            googleButton = `
-
-                <a
-                    class="google-button"
-                    href="${safeURL}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    View on Google Maps
-                </a>
-
-            `;
-
-        }
-
-
-        const popupHTML = `
-
-            <div class="restaurant-card">
-
-                <div class="restaurant-name">
-
-                    ${name}
-
-                </div>
-
-
-                <div class="restaurant-type">
-
-                    ${categories}
-
-                </div>
-
-
-                <div class="restaurant-hours">
-
-                    ⏰ ${hours}
-
-                </div>
-
-
-                ${statusHTML}
-
-
-                ${googleButton}
-
-            </div>
-
-        `;
-
-
-        new maplibregl.Popup({
-
-            offset: 12,
-
-            closeButton: true,
-
-            closeOnClick: true
-
-        })
-
-            .setLngLat(
-                feature.geometry.coordinates
-            )
-
-            .setHTML(
-                popupHTML
-            )
-
-            .addTo(map);
-
-    }
-
-
-    /* ==========================================
-       CATEGORY FILTER
-       ========================================== */
-
-    const categoryButtons =
-        document.querySelectorAll(
-            ".category-button"
-        );
-
-
-    const categoryPropertyMap = {
-
-        "vegan":
-            "hasVegan",
-
-        "lacto-ovo":
-            "hasLactoOvo",
-
-        "no-alliums":
-            "hasNoAlliums",
-
-        "dessert":
-            "hasDessert"
-
-    };
-
-
-    categoryButtons.forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const selectedCategory =
-                        button.dataset.category;
-
-
-                    /* =========================
-                       ACTIVE BUTTON
-                       ========================= */
-
-                    categoryButtons.forEach(
-                        btn => {
-
-                            btn.classList
-                                .remove("active");
-
-                        }
-                    );
-
-
-                    button.classList
-                        .add("active");
-
-
-                    /* =========================
-                       BASE FILTER
-                       ========================= */
-
-                    const baseFilter = [
-
-                        "!",
-
-                        [
-                            "has",
-                            "point_count"
-                        ]
-
-                    ];
-
-
-                    let categoryFilter =
-                        null;
-
-
-                    /* =========================
-                       CATEGORY FILTER
-                       ========================= */
-
-                    if (
-                        selectedCategory !==
-                        "all"
-                    ) {
-
-                        const property =
-                            categoryPropertyMap[
-                                selectedCategory
-                            ];
-
-
-                        if (property) {
-
-                            categoryFilter = [
-
-                                "==",
-
-                                [
-                                    "get",
-                                    property
-                                ],
-
-                                1
-
-                            ];
-
-                        }
-
-                    }
-
-
-                    /* =========================
-                       FINAL FILTER
-                       ========================= */
-
-                    let finalBaseFilter;
-
-
-                    if (categoryFilter) {
-
-                        finalBaseFilter = [
-
-                            "all",
-
-                            baseFilter,
-
-                            categoryFilter
-
-                        ];
-
-                    } else {
-
-                        finalBaseFilter =
-                            baseFilter;
-
-                    }
-
-
-                    /* =========================
-                       OPEN
-                       ========================= */
-
-                    map.setFilter(
-                        "restaurant-open",
-                        [
-
-                            "all",
-
-                            finalBaseFilter,
-
-                            [
-                                "==",
-                                [
-                                    "get",
-                                    "isOpen"
-                                ],
-                                1
-                            ]
-
-                        ]
-                    );
-
-
-                    /* =========================
-                       CLOSED
-                       ========================= */
-
-                    map.setFilter(
-                        "restaurant-closed",
-                        [
-
-                            "all",
-
-                            finalBaseFilter,
-
-                            [
-                                "==",
-                                [
-                                    "get",
-                                    "isOpen"
-                                ],
-                                0
-                            ]
-
-                        ]
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-    /* ==========================================
-       START
-       ========================================== */
-
-    map.on(
-        "load",
-        () => {
-
-            loadRestaurants();
-
-        }
-    );
-
-</script>
+```
