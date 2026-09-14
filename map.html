@@ -75,7 +75,110 @@
 
             backdrop-filter: blur(8px);
         }
+/* =========================
+   TOP ROW
+   ========================= */
 
+.top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* =========================
+   SEARCH BUTTON
+   ========================= */
+
+.search-button {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f2f6f3;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   CATEGORY FILTERS
+   ========================= */
+
+.category-row {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 10px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+
+.category-row::-webkit-scrollbar {
+    display: none;
+}
+
+
+.category-button {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 8px 11px;
+
+    border: 1px solid #e2e8e3;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    color: #4b554e;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+
+.category-button:hover {
+    border-color: #b9cbbd;
+}
+
+
+.category-button:active {
+    transform: scale(0.97);
+}
+
+
+.category-button.active {
+    background: #245c35;
+
+    border-color: #245c35;
+
+    color: white;
+}
 
         /* =========================
            LOGO
@@ -331,28 +434,86 @@
          TOP BAR
          ========================= -->
 
-    <div class="top-bar">
+<div class="top-bar">
+
+    <div class="top-row">
 
         <div class="logo">
             <span class="logo-mark"></span>
             veg&me
         </div>
 
-        <div class="legend">
+        <button
+            id="search-button"
+            class="search-button"
+            aria-label="Search"
+        >
+            🔍
+        </button>
 
-            <div class="legend-item">
-                <span class="legend-dot legend-open"></span>
-                Open
-            </div>
+    </div>
 
-            <div class="legend-item">
-                <span class="legend-dot legend-closed"></span>
-                Closed
-            </div>
 
+    <div class="category-row">
+
+        <button
+            class="category-button active"
+            data-category="all"
+        >
+            🌱
+            <span>All</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="vegan"
+        >
+            🌱
+            <span>Pure Vegan</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="lacto-ovo"
+        >
+            🥚
+            <span>Lacto-Ovo</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="no-alliums"
+        >
+            🌿
+            <span>No Alliums</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="dessert"
+        >
+            🍰
+            <span>Dessert</span>
+        </button>
+
+    </div>
+
+
+    <div class="legend">
+
+        <div class="legend-item">
+            <span class="legend-dot legend-open"></span>
+            Open
+        </div>
+
+        <div class="legend-item">
+            <span class="legend-dot legend-closed"></span>
+            Closed
         </div>
 
     </div>
+
+</div>
 
 
     <!-- =========================
@@ -579,58 +740,86 @@
 
         function translateDietary(tag) {
 
-            if (!tag) {
-                return "Vegetarian";
-            }
+    if (!tag) {
+        return {
+            category: "unknown",
+            label: "Vegetarian"
+        };
+    }
 
-            const t =
-                tag.toUpperCase().trim();
-
-
-            if (
-                t === "V" ||
-                t.includes("VEGAN")
-            ) {
-                return "🌱 Vegan";
-            }
+    const t = tag
+        .toUpperCase()
+        .trim();
 
 
-            if (
-                t === "O" ||
-                t.includes("OVO")
-            ) {
-                return "🥚 Ovo";
-            }
+    /* Pure Vegan */
+
+    if (
+        t === "V" ||
+        t === "VEGAN" ||
+        t.includes("PURE VEGAN") ||
+        t.includes("純素") ||
+        t.includes("全素")
+    ) {
+        return {
+            category: "vegan",
+            label: "🌱 Pure Vegan · 全素"
+        };
+    }
 
 
-            if (
-                t === "L" ||
-                t.includes("LACTO")
-            ) {
-                return "🥛 Lacto";
-            }
+    /* Lacto-Ovo */
+
+    if (
+        t === "VO" ||
+        t.includes("LACTO-OVO") ||
+        t.includes("OVO-LACTO") ||
+        t.includes("LACTO OVO") ||
+        t.includes("蛋奶素")
+    ) {
+        return {
+            category: "lacto-ovo",
+            label: "🥚 Lacto-Ovo · 蛋奶素"
+        };
+    }
 
 
-            if (
-                t === "VO" ||
-                t.includes("OVO-LACTO")
-            ) {
-                return "🥚🥛 Ovo-Lacto";
-            }
+    /* No Alliums */
+
+    if (
+        t === "P" ||
+        t.includes("PUNGENT") ||
+        t.includes("NO ALLIUM") ||
+        t.includes("五辛") ||
+        t.includes("植物五辛")
+    ) {
+        return {
+            category: "no-alliums",
+            label: "🌿 No Alliums · 植物五辛素"
+        };
+    }
 
 
-            if (
-                t === "P" ||
-                t.includes("PUNGENT")
-            ) {
-                return "🧅 Pentarian";
-            }
+    /* Dessert */
+
+    if (
+        t.includes("DESSERT") ||
+        t.includes("甜品") ||
+        t.includes("甜點")
+    ) {
+        return {
+            category: "dessert",
+            label: "🍰 Dessert · 甜品"
+        };
+    }
 
 
-            return escapeHTML(tag);
-        }
-
-
+    return {
+        category: "unknown",
+        label: escapeHTML(tag)
+    };
+}
+        
         function translateShopType(type) {
 
             if (!type) {
@@ -804,9 +993,8 @@
                     "Vegetarian restaurant";
 
 
-                const dietary =
-                    translateDietary(
-                        row.Tag || row.Dietary
+                const dietary = translateDietary(
+                   row.Tag || row.Dietary
                     );
 
 
@@ -851,7 +1039,9 @@
 
                         name,
 
-                        dietary,
+                        dietary: dietary.label,
+
+                        category: dietary.category,
 
                         shopType,
 
@@ -1420,6 +1610,105 @@
            START
            ========================================== */
 
+        /* ==========================================
+   CATEGORY FILTER
+   ========================================== */
+
+const categoryButtons =
+    document.querySelectorAll(".category-button");
+
+
+categoryButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const selectedCategory =
+            button.dataset.category;
+
+
+        /* ------------------------------
+           Update active button
+           ------------------------------ */
+
+        categoryButtons.forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+
+        /* ------------------------------
+           Build restaurant filter
+           ------------------------------ */
+
+        const baseFilter = [
+            "!",
+            ["has", "point_count"]
+        ];
+
+
+        let filter;
+
+
+        if (selectedCategory === "all") {
+
+            filter = baseFilter;
+
+        } else {
+
+            filter = [
+                "all",
+
+                baseFilter,
+
+                [
+                    "==",
+                    ["get", "category"],
+                    selectedCategory
+                ]
+            ];
+        }
+
+
+        /* ------------------------------
+           Apply filter
+           ------------------------------ */
+
+        map.setFilter(
+            "restaurant-open",
+            [
+                "all",
+
+                filter,
+
+                [
+                    "==",
+                    ["get", "isOpen"],
+                    1
+                ]
+            ]
+        );
+
+
+        map.setFilter(
+            "restaurant-closed",
+            [
+                "all",
+
+                filter,
+
+                [
+                    "==",
+                    ["get", "isOpen"],
+                    0
+                ]
+            ]
+        );
+
+    });
+
+});
+        
         map.on(
             "load",
             () => {
