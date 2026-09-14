@@ -1,150 +1,1437 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veg&Me | Taiwan Veg Map</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
+    <!-- Mobile-first -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>veg&me | Vegetarian Map</title>
+
+    <!-- MapLibre GL JS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.css"
+    />
+
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        #map { height: 100vh; width: 100vw; }
-        
-        .header-bar {
-            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95); padding: 10px 20px;
-            border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            z-index: 1000; font-weight: bold; font-size: 1.2rem; color: #2e7d32;
+        * {
+            box-sizing: border-box;
         }
 
-        /* Custom Map Pins */
-        .map-pin {
-            width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
-            position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -12px 0 0 -12px;
-            box-shadow: -1px 2px 3px rgba(0,0,0,0.3); border: 2px solid white;
-        }
-        .map-pin::after {
-            content: ''; width: 8px; height: 8px; margin: 8px 0 0 8px; background: white;
-            position: absolute; border-radius: 50%;
-        }
-        .pin-open { background: #4CAF50; }  
-        .pin-closed { background: #9E9E9E; } 
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
 
-        /* Popup Box Styles */
-        .popup-title { font-weight: bold; font-size: 1.1rem; color: #1b5e20; margin-bottom: 5px; }
-        .popup-tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; margin-right: 4px; margin-top: 4px;}
-        .tag-dietary { background: #4caf50; }
-        .tag-shop { background: #0288d1; }
-        .popup-info { font-size: 0.85rem; margin-top: 8px; color: #424242; line-height: 1.5; }
-        .status-text { font-weight: bold; margin-top: 5px; }
-        .photo-link { display: inline-block; margin-top: 8px; color: #0288d1; text-decoration: none; font-weight: bold; }
-        .photo-link:hover { text-decoration: underline; }
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+        }
+
+        /* =========================
+           MAP
+           ========================= */
+
+        #map {
+            width: 100%;
+            height: 100dvh;
+        }
+
+
+        /* =========================
+           TOP BAR
+           ========================= */
+
+        .top-bar {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+
+            z-index: 10;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 10px 14px;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 3px 14px rgba(0, 0, 0, 0.12);
+
+            backdrop-filter: blur(8px);
+        }
+
+
+        /* =========================
+           LOGO
+           ========================= */
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #245c35;
+
+            font-size: 18px;
+            font-weight: 700;
+
+            letter-spacing: -0.3px;
+        }
+
+        .logo-mark {
+            width: 10px;
+            height: 10px;
+
+            border-radius: 50%;
+
+            background: #4caf50;
+        }
+
+
+        /* =========================
+           STATUS LEGEND
+           ========================= */
+
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: #555;
+
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+        }
+
+        .legend-open {
+            background: #3fae5a;
+        }
+
+        .legend-closed {
+            background: #a7a7a7;
+        }
+
+
+        /* =========================
+           POPUP
+           ========================= */
+
+        .maplibregl-popup-content {
+            padding: 0;
+
+            width: min(290px, calc(100vw - 40px));
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 6px 25px rgba(0, 0, 0, 0.16);
+        }
+
+        .maplibregl-popup-close-button {
+            z-index: 2;
+
+            width: 34px;
+            height: 34px;
+
+            font-size: 22px;
+
+            color: #666;
+        }
+
+        .restaurant-card {
+            padding: 17px;
+        }
+
+        .restaurant-name {
+            padding-right: 20px;
+
+            color: #183c24;
+
+            font-size: 18px;
+            font-weight: 700;
+
+            line-height: 1.3;
+        }
+
+        .restaurant-type {
+            margin-top: 7px;
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+        .restaurant-hours {
+            margin-top: 12px;
+
+            color: #444;
+
+            font-size: 13px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+
+            margin-top: 10px;
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-open {
+            color: #236b36;
+            background: #e7f5eb;
+        }
+
+        .status-closed {
+            color: #666;
+            background: #eeeeee;
+        }
+
+        .google-button {
+            display: block;
+
+            margin-top: 15px;
+            padding: 11px 13px;
+
+            border-radius: 10px;
+
+            background: #245c35;
+            color: white;
+
+            text-align: center;
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .google-button:active {
+            transform: scale(0.98);
+        }
+
+
+        /* =========================
+           LOADING
+           ========================= */
+
+        .loading {
+            position: fixed;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
+
+            z-index: 20;
+
+            padding: 10px 15px;
+
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, 0.95);
+
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.12);
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+
+        /* =========================
+           MAP CONTROLS
+           ========================= */
+
+        .maplibregl-ctrl-group {
+            border: none;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 3px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .maplibregl-ctrl button {
+            width: 42px;
+            height: 42px;
+        }
+
+
+        /* =========================
+           MOBILE
+           ========================= */
+
+        @media (max-width: 600px) {
+
+            .top-bar {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+
+                padding: 9px 12px;
+            }
+
+            .logo {
+                font-size: 17px;
+            }
+
+            .legend {
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
+
+
 <body>
 
-    <div class="header-bar">🌱 Veg&Me Map</div>
+    <!-- =========================
+         TOP BAR
+         ========================= -->
+
+    <div class="top-bar">
+
+        <div class="logo">
+            <span class="logo-mark"></span>
+            veg&me
+        </div>
+
+        <div class="legend">
+
+            <div class="legend-item">
+                <span class="legend-dot legend-open"></span>
+                Open
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-dot legend-closed"></span>
+                Closed
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         MAP
+         ========================= -->
+
     <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-    <script>
-        const map = L.map('map').setView([23.6, 121.0], 8);
+    <!-- =========================
+         LOADING
+         ========================= -->
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+    <div id="loading" class="loading">
+        Loading map...
+    </div>
 
-        // Smart Code Transformer for Shortcodes & Form Responses
-        function translateDietary(tag) {
-            if (!tag) return '蔬食 / Veg';
-            let t = tag.toUpperCase().trim();
-            if (t === 'V' || t.includes('V :') || t.includes('VEGAN')) return '🌱 全素 / Vegan';
-            if (t === 'O' || t.includes('O :') || t.includes('OVO')) return '🥚 蛋素 / Ovo';
-            if (t === 'L' || t.includes('L :') || t.includes('LACTO')) return '🥛 奶素 / Lacto';
-            if (t === 'VO' || t.includes('VO :') || t.includes('OVO-LACTO')) return '🥚🥛 蛋奶素 / Ovo-Lacto';
-            if (t === 'P' || t.includes('P :') || t.includes('PUNGENT')) return '🧅 五辛素 / Pentarian';
-            if (t === 'D' || t.includes('D :') || t.includes('DESSERT')) return '🍰 甜點 / Dessert';
-            return tag; 
+
+    <!-- =========================
+         MAPLIBRE
+         ========================= -->
+
+    <script type="module">
+
+        import * as maplibregl from
+            "https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.mjs";
+
+
+        /* ==========================================
+           CONFIGURATION
+           ========================================== */
+
+        const GOOGLE_SHEET_CSV =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFyCfwrZTOpDkmpHsU2qlNmnVltRGxs0TZLbvRB0EL3d-donR3HdkY1vR4bBFxQtN2X_D0D2c5KW5n/pub?output=csv";
+
+
+        /*
+         * IMPORTANT
+         *
+         * This is only our first prototype.
+         *
+         * Later we will replace this with our
+         * own optimized restaurant data system.
+         */
+
+
+        /* ==========================================
+           MAP
+           ========================================== */
+
+        const map = new maplibregl.Map({
+
+            container: "map",
+
+            /*
+             * Temporary demo style.
+             *
+             * Later we should replace this with
+             * our own OpenStreetMap-based style/tile
+             * infrastructure.
+             */
+            style: "https://demotiles.maplibre.org/globe.json",
+
+            center: [121.0, 23.7],
+
+            zoom: 7.5,
+
+            minZoom: 2,
+
+            maxZoom: 18,
+
+            attributionControl: true
+        });
+
+
+        /* ==========================================
+           CONTROLS
+           ========================================== */
+
+        map.addControl(
+            new maplibregl.NavigationControl({
+                showCompass: false
+            }),
+            "bottom-right"
+        );
+
+
+        /* ==========================================
+           LOADING
+           ========================================== */
+
+        const loading =
+            document.getElementById("loading");
+
+
+        /* ==========================================
+           CSV PARSER
+           ========================================== */
+
+        function parseCSV(text) {
+
+            const rows = [];
+
+            let row = [];
+
+            let value = "";
+
+            let insideQuotes = false;
+
+
+            for (let i = 0; i < text.length; i++) {
+
+                const char = text[i];
+
+                const next = text[i + 1];
+
+
+                if (char === '"' && insideQuotes && next === '"') {
+
+                    value += '"';
+
+                    i++;
+
+                    continue;
+                }
+
+
+                if (char === '"') {
+
+                    insideQuotes = !insideQuotes;
+
+                    continue;
+                }
+
+
+                if (char === "," && !insideQuotes) {
+
+                    row.push(value);
+
+                    value = "";
+
+                    continue;
+                }
+
+
+                if (
+                    (char === "\n" || char === "\r") &&
+                    !insideQuotes
+                ) {
+
+                    if (char === "\r" && next === "\n") {
+                        i++;
+                    }
+
+                    row.push(value);
+
+                    rows.push(row);
+
+                    row = [];
+
+                    value = "";
+
+                    continue;
+                }
+
+
+                value += char;
+            }
+
+
+            if (value.length > 0 || row.length > 0) {
+
+                row.push(value);
+
+                rows.push(row);
+            }
+
+
+            if (rows.length === 0) {
+                return [];
+            }
+
+
+            const headers = rows[0].map(
+                header => header.trim()
+            );
+
+
+            return rows
+                .slice(1)
+                .filter(row =>
+                    row.some(cell => cell.trim() !== "")
+                )
+                .map(row => {
+
+                    const object = {};
+
+                    headers.forEach((header, index) => {
+
+                        object[header] =
+                            (row[index] || "").trim();
+
+                    });
+
+                    return object;
+                });
         }
+
+
+        /* ==========================================
+           TEXT HELPERS
+           ========================================== */
+
+        function escapeHTML(value) {
+
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        function translateDietary(tag) {
+
+            if (!tag) {
+                return "Vegetarian";
+            }
+
+            const t =
+                tag.toUpperCase().trim();
+
+
+            if (
+                t === "V" ||
+                t.includes("VEGAN")
+            ) {
+                return "🌱 Vegan";
+            }
+
+
+            if (
+                t === "O" ||
+                t.includes("OVO")
+            ) {
+                return "🥚 Ovo";
+            }
+
+
+            if (
+                t === "L" ||
+                t.includes("LACTO")
+            ) {
+                return "🥛 Lacto";
+            }
+
+
+            if (
+                t === "VO" ||
+                t.includes("OVO-LACTO")
+            ) {
+                return "🥚🥛 Ovo-Lacto";
+            }
+
+
+            if (
+                t === "P" ||
+                t.includes("PUNGENT")
+            ) {
+                return "🧅 Pentarian";
+            }
+
+
+            return escapeHTML(tag);
+        }
+
 
         function translateShopType(type) {
-            if (!type) return '店家 / Shop';
-            let t = type.toUpperCase().trim();
-            if (t === 'PURE' || t === 'P' || t.includes('純素')) return '🏪 純素餐廳 / 100% Veg';
-            if (t === 'FRIENDLY' || t === 'F' || t.includes('葷素')) return '🥗 葷素共食 / Friendly';
-            return type;
+
+            if (!type) {
+                return "";
+            }
+
+            const t =
+                type.toUpperCase().trim();
+
+
+            if (
+                t === "PURE" ||
+                t === "P" ||
+                t.includes("純素")
+            ) {
+                return "100% Vegetarian";
+            }
+
+
+            if (
+                t === "FRIENDLY" ||
+                t === "F" ||
+                t.includes("葷素")
+            ) {
+                return "Vegetarian Friendly";
+            }
+
+
+            return escapeHTML(type);
         }
 
-        const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFyCfwrZTOpDkmpHsU2qlNmnVltRGxs0TZLbvRB0EL3d-donR3HdkY1vR4bBFxQtN2X_D0D2c5KW5n/pub?output=csv';
 
-        Papa.parse(googleSheetCsvUrl, {
-            download: true,
-            header: true,
-            complete: function(results) {
-                const data = results.data;
-                const currentHour = new Date().getHours(); 
-                let validMarkers = [];
+        /* ==========================================
+           OPENING HOURS
+           ========================================== */
 
-                data.forEach(row => {
-                    if (row.Latitude && row.Longitude) {
-                        const lat = parseFloat(row.Latitude);
-                        const lng = parseFloat(row.Longitude);
-                        const openH = parseInt(row.OpenHour);
-                        const closeH = parseInt(row.CloseHour);
-                        
-                        // Calculate Open/Closed status
-                        let isOpen = false;
-                        if (currentHour >= openH && currentHour < closeH) {
-                            isOpen = true;
+        function getOpenStatus(row) {
+
+            const openHour =
+                Number(row.OpenHour);
+
+            const closeHour =
+                Number(row.CloseHour);
+
+
+            if (
+                !Number.isFinite(openHour) ||
+                !Number.isFinite(closeHour)
+            ) {
+
+                return {
+                    isOpen: false,
+                    known: false
+                };
+            }
+
+
+            /*
+             * TEMPORARY:
+             *
+             * This uses browser time for the prototype.
+             *
+             * We will replace this with restaurant
+             * local timezone logic before worldwide launch.
+             */
+
+            const now = new Date();
+
+            const currentMinutes =
+                now.getHours() * 60 +
+                now.getMinutes();
+
+
+            const openMinutes =
+                openHour * 60;
+
+            const closeMinutes =
+                closeHour * 60;
+
+
+            let isOpen;
+
+
+            /*
+             * Normal opening:
+             *
+             * 11:00 → 21:00
+             */
+
+            if (closeMinutes > openMinutes) {
+
+                isOpen =
+                    currentMinutes >= openMinutes &&
+                    currentMinutes < closeMinutes;
+
+            }
+
+            /*
+             * Overnight opening:
+             *
+             * 18:00 → 02:00
+             */
+
+            else {
+
+                isOpen =
+                    currentMinutes >= openMinutes ||
+                    currentMinutes < closeMinutes;
+            }
+
+
+            return {
+                isOpen,
+                known: true
+            };
+        }
+
+
+        /* ==========================================
+           CREATE GEOJSON
+           ========================================== */
+
+        function createGeoJSON(rows) {
+
+            const features = [];
+
+
+            for (const row of rows) {
+
+                const latitude =
+                    Number(row.Latitude);
+
+                const longitude =
+                    Number(row.Longitude);
+
+
+                /*
+                 * Ignore invalid coordinates.
+                 */
+
+                if (
+                    !Number.isFinite(latitude) ||
+                    !Number.isFinite(longitude)
+                ) {
+                    continue;
+                }
+
+
+                const status =
+                    getOpenStatus(row);
+
+
+                const openHour =
+                    Number(row.OpenHour);
+
+                const closeHour =
+                    Number(row.CloseHour);
+
+
+                const hours =
+                    Number.isFinite(openHour) &&
+                    Number.isFinite(closeHour)
+
+                        ? `${openHour}:00 – ${closeHour}:00`
+
+                        : "Hours unavailable";
+
+
+                const name =
+                    row.Name ||
+                    "Vegetarian restaurant";
+
+
+                const dietary =
+                    translateDietary(
+                        row.Tag || row.Dietary
+                    );
+
+
+                const shopType =
+                    translateShopType(
+                        row.ShopType
+                    );
+
+
+                /*
+                 * Your Google Maps URL.
+                 *
+                 * If your spreadsheet already has
+                 * GoogleMaps / Google Maps / MapsLink,
+                 * we can use it.
+                 */
+
+                const googleMapsURL =
+                    row.GoogleMaps ||
+                    row["Google Maps"] ||
+                    row.MapsLink ||
+                    row.GoogleMap ||
+                    "";
+
+
+                features.push({
+
+                    type: "Feature",
+
+                    geometry: {
+
+                        type: "Point",
+
+                        coordinates: [
+                            longitude,
+                            latitude
+                        ]
+
+                    },
+
+                    properties: {
+
+                        name,
+
+                        dietary,
+
+                        shopType,
+
+                        hours,
+
+                        isOpen:
+                            status.isOpen ? 1 : 0,
+
+                        statusKnown:
+                            status.known ? 1 : 0,
+
+                        googleMapsURL
+
+                    }
+
+                });
+            }
+
+
+            return {
+
+                type: "FeatureCollection",
+
+                features
+            };
+        }
+
+
+        /* ==========================================
+           LOAD RESTAURANTS
+           ========================================== */
+
+        async function loadRestaurants() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        GOOGLE_SHEET_CSV,
+                        {
+                            cache: "no-store"
                         }
+                    );
 
-                        const pinStyleClass = isOpen ? 'pin-open' : 'pin-closed';
-                        const statusLabel = isOpen ? '🟢 營業中 (Open Now)' : '🔘 休息中 (Closed)';
 
-                        const customIcon = L.divIcon({
-                            className: 'custom-pin-container',
-                            html: `<div class="map-pin ${pinStyleClass}"></div>`,
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 24],
-                            popupAnchor: [0, -24]
-                        });
+                if (!response.ok) {
 
-                        // Dynamic Photo Link Check
-                        // If your sheet has a column named "Image" or "Photo", it will display here
-                        const photoUrl = row.Image || row.Photo || row.ImageUrl;
-                        const photoHtml = photoUrl ? `<a href="${photoUrl}" target="_blank" class="photo-link">📸 查看菜單/照片 (View Photo)</a>` : '';
+                    throw new Error(
+                        "Could not load restaurant data."
+                    );
+                }
 
-                        const popupContent = `
-                            <div class="popup-title">${row.Name}</div>
-                            <div>
-                                <span class="popup-tag tag-dietary">${translateDietary(row.Tag || row.Dietary)}</span>
-                                <span class="popup-tag tag-shop">${translateShopType(row.ShopType || '')}</span>
-                            </div>
-                            <div class="popup-info">
-                                <strong>📍 地址 / Addr:</strong> ${row.Address}<br>
-                                <strong>⏰ 時間 / Hours:</strong> ${openH}:00 - ${closeH}:00<br>
-                                <div class="status-text" style="color: ${isOpen ? '#2e7d32' : '#757575'}">${statusLabel}</div>
-                                ${photoHtml}
-                                ${row.Review ? `<hr style="border:0; border-top:1px solid #ddd; margin:8px 0;"><em>"${row.Review}"</em>` : ''}
-                            </div>
-                        `;
 
-                        const marker = L.marker([lat, lng], { icon: customIcon }).bindPopup(popupContent);
-                        marker.addTo(map);
-                        validMarkers.push(marker);
+                const csv =
+                    await response.text();
+
+
+                const rows =
+                    parseCSV(csv);
+
+
+                const geojson =
+                    createGeoJSON(rows);
+
+
+                /*
+                 * Add restaurant data as ONE
+                 * GeoJSON source.
+                 *
+                 * This is important.
+                 *
+                 * We are NOT creating hundreds
+                 * of individual HTML markers.
+                 */
+
+                map.addSource(
+                    "restaurants",
+                    {
+
+                        type: "geojson",
+
+                        data: geojson,
+
+                        /*
+                         * This prepares us for
+                         * clustering later.
+                         */
+
+                        cluster: true,
+
+                        clusterMaxZoom: 13,
+
+                        clusterRadius: 50
+                    }
+                );
+
+
+                /* ==================================
+                   CLUSTERS
+                   ================================== */
+
+                map.addLayer({
+
+                    id: "restaurant-clusters",
+
+                    type: "circle",
+
+                    source: "restaurants",
+
+                    filter: [
+                        "has",
+                        "point_count"
+                    ],
+
+                    paint: {
+
+                        "circle-color": "#245c35",
+
+                        "circle-radius": [
+                            "step",
+
+                            [
+                                "get",
+                                "point_count"
+                            ],
+
+                            18,
+
+                            10,
+                            22,
+
+                            50,
+                            28
+                        ],
+
+                        "circle-stroke-width": 2,
+
+                        "circle-stroke-color": "#ffffff"
                     }
                 });
 
-                if (validMarkers.length > 0) {
-                    const group = new L.featureGroup(validMarkers);
-                    map.fitBounds(group.getBounds().pad(0.2));
-                }
-            }
-        });
-    </script>
-</body>
-</html>
 
+                /* ==================================
+                   CLUSTER NUMBER
+                   ================================== */
+
+                map.addLayer({
+
+                    id: "restaurant-cluster-count",
+
+                    type: "symbol",
+
+                    source: "restaurants",
+
+                    filter: [
+                        "has",
+                        "point_count"
+                    ],
+
+                    layout: {
+
+                        "text-field": [
+                            "get",
+                            "point_count_abbreviated"
+                        ],
+
+                        "text-size": 12
+                    },
+
+                    paint: {
+
+                        "text-color": "#ffffff"
+                    }
+                });
+
+
+                /* ==================================
+                   OPEN RESTAURANTS
+                   ================================== */
+
+                map.addLayer({
+
+                    id: "restaurant-open",
+
+                    type: "circle",
+
+                    source: "restaurants",
+
+                    filter: [
+
+                        "all",
+
+                        [
+                            "!",
+                            [
+                                "has",
+                                "point_count"
+                            ]
+                        ],
+
+                        [
+                            "==",
+                            [
+                                "get",
+                                "isOpen"
+                            ],
+                            1
+                        ]
+
+                    ],
+
+                    paint: {
+
+                        "circle-radius": 7,
+
+                        "circle-color": "#3fae5a",
+
+                        "circle-stroke-width": 2,
+
+                        "circle-stroke-color": "#ffffff",
+
+                        "circle-opacity": 0.95
+                    }
+                });
+
+
+                /* ==================================
+                   CLOSED RESTAURANTS
+                   ================================== */
+
+                map.addLayer({
+
+                    id: "restaurant-closed",
+
+                    type: "circle",
+
+                    source: "restaurants",
+
+                    filter: [
+
+                        "all",
+
+                        [
+                            "!",
+                            [
+                                "has",
+                                "point_count"
+                            ]
+                        ],
+
+                        [
+                            "==",
+                            [
+                                "get",
+                                "isOpen"
+                            ],
+                            0
+                        ]
+
+                    ],
+
+                    paint: {
+
+                        "circle-radius": 6,
+
+                        "circle-color": "#a7a7a7",
+
+                        "circle-stroke-width": 2,
+
+                        "circle-stroke-color": "#ffffff",
+
+                        "circle-opacity": 0.85
+                    }
+                });
+
+
+                /* ==================================
+                   CLICK CLUSTER
+                   ================================== */
+
+                map.on(
+                    "click",
+                    "restaurant-clusters",
+                    async event => {
+
+                        const features =
+                            map.queryRenderedFeatures(
+                                event.point,
+                                {
+                                    layers: [
+                                        "restaurant-clusters"
+                                    ]
+                                }
+                            );
+
+
+                        const clusterId =
+                            features[0]
+                                .properties
+                                .cluster_id;
+
+
+                        const zoom =
+                            await map
+                                .getSource(
+                                    "restaurants"
+                                )
+                                .getClusterExpansionZoom(
+                                    clusterId
+                                );
+
+
+                        map.easeTo({
+
+                            center:
+                                features[0]
+                                    .geometry
+                                    .coordinates,
+
+                            zoom
+
+                        });
+                    }
+                );
+
+
+                /* ==================================
+                   CLICK RESTAURANT
+                   ================================== */
+
+                map.on(
+                    "click",
+                    "restaurant-open",
+                    showRestaurant
+                );
+
+
+                map.on(
+                    "click",
+                    "restaurant-closed",
+                    showRestaurant
+                );
+
+
+                /* ==================================
+                   CURSOR
+                   ================================== */
+
+                map.on(
+                    "mouseenter",
+                    "restaurant-open",
+                    () => {
+                        map.getCanvas().style.cursor =
+                            "pointer";
+                    }
+                );
+
+                map.on(
+                    "mouseleave",
+                    "restaurant-open",
+                    () => {
+                        map.getCanvas().style.cursor =
+                            "";
+                    }
+                );
+
+
+                map.on(
+                    "mouseenter",
+                    "restaurant-closed",
+                    () => {
+                        map.getCanvas().style.cursor =
+                            "pointer";
+                    }
+                );
+
+                map.on(
+                    "mouseleave",
+                    "restaurant-closed",
+                    () => {
+                        map.getCanvas().style.cursor =
+                            "";
+                    }
+                );
+
+
+                /*
+                 * Hide loading.
+                 */
+
+                loading.classList.add("hidden");
+
+
+                /*
+                 * If restaurants exist,
+                 * fit the map around them.
+                 */
+
+                if (geojson.features.length > 0) {
+
+                    const bounds =
+                        new maplibregl.LngLatBounds();
+
+
+                    for (
+                        const feature
+                        of geojson.features
+                    ) {
+
+                        bounds.extend(
+                            feature.geometry.coordinates
+                        );
+                    }
+
+
+                    map.fitBounds(
+                        bounds,
+                        {
+                            padding: {
+                                top: 100,
+                                bottom: 80,
+                                left: 40,
+                                right: 40
+                            },
+
+                            maxZoom: 13,
+
+                            duration: 800
+                        }
+                    );
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                loading.textContent =
+                    "Unable to load restaurant data.";
+
+            }
+        }
+
+
+        /* ==========================================
+           RESTAURANT POPUP
+           ========================================== */
+
+        function showRestaurant(event) {
+
+            const feature =
+                event.features[0];
+
+
+            const properties =
+                feature.properties;
+
+
+            const name =
+                escapeHTML(properties.name);
+
+
+            const dietary =
+                properties.dietary;
+
+
+            const shopType =
+                properties.shopType;
+
+
+            const hours =
+                escapeHTML(properties.hours);
+
+
+            const isOpen =
+                Number(properties.isOpen) === 1;
+
+
+            const statusHTML = isOpen
+
+                ? `
+                    <div class="status status-open">
+                        ● Open now
+                    </div>
+                  `
+
+                : `
+                    <div class="status status-closed">
+                        ● Closed
+                    </div>
+                  `;
+
+
+            let googleButton = "";
+
+
+            if (properties.googleMapsURL) {
+
+                const safeURL =
+                    String(
+                        properties.googleMapsURL
+                    ).replace(/"/g, "&quot;");
+
+
+                googleButton = `
+                    <a
+                        class="google-button"
+                        href="${safeURL}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        View on Google Maps
+                    </a>
+                `;
+            }
+
+
+            const popupHTML = `
+
+                <div class="restaurant-card">
+
+                    <div class="restaurant-name">
+                        ${name}
+                    </div>
+
+                    <div class="restaurant-type">
+                        ${dietary}
+                        ${shopType
+                            ? ` · ${shopType}`
+                            : ""}
+                    </div>
+
+                    <div class="restaurant-hours">
+                        ⏰ ${hours}
+                    </div>
+
+                    ${statusHTML}
+
+                    ${googleButton}
+
+                </div>
+            `;
+
+
+            new maplibregl.Popup({
+
+                offset: 12,
+
+                closeButton: true,
+
+                closeOnClick: true
+
+            })
+
+                .setLngLat(
+                    feature.geometry.coordinates
+                )
+
+                .setHTML(popupHTML)
+
+                .addTo(map);
+        }
+
+
+        /* ==========================================
+           START
+           ========================================== */
+
+        map.on(
+            "load",
+            () => {
+
+                loadRestaurants();
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
+```
