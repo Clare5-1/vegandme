@@ -810,132 +810,93 @@
 
 
     /* ==========================================
-       TIME HELPERS
+       OPENING HOURS
        ========================================== */
 
+    /*
+     * Google Sheet weekday columns:
+     * MondayOpen, MondayClose ... SundayOpen, SundayClose
+     * Leave a pair blank when the restaurant is closed that day.
+     * OpenHour and CloseHour remain as a fallback for existing rows.
+     */
+    const WEEK_DAYS = [
+        { name: "Sunday", label: "Sun" },
+        { name: "Monday", label: "Mon" },
+        { name: "Tuesday", label: "Tue" },
+        { name: "Wednesday", label: "Wed" },
+        { name: "Thursday", label: "Thu" },
+        { name: "Friday", label: "Fri" },
+        { name: "Saturday", label: "Sat" }
+    ];
+
     function timeToMinutes(value) {
+        if (!value) return NaN;
 
-        if (!value) {
+        const text = String(value).trim();
+        const parts = text.includes(":") ? text.split(":") : [text, "0"];
+        const hours = Number(parts[0]);
+        const minutes = Number(parts[1]);
 
-            return NaN;
-        }
-
-
-        const text =
-            String(value).trim();
-
-
-        if (text.includes(":")) {
-
-            const parts =
-                text.split(":");
-
-
-            const hours =
-                Number(parts[0]);
-
-
-            const minutes =
-                Number(parts[1]);
-
-
-            if (
-                Number.isFinite(hours) &&
-                Number.isFinite(minutes)
-            ) {
-
-                return (
-                    hours * 60 +
-                    minutes
-                );
-            }
-
-
-            return NaN;
-        }
-
-
-        const hour =
-            Number(text);
-
-
-        if (
-            Number.isFinite(hour)
-        ) {
-
-            return hour * 60;
-        }
-
-
-        return NaN;
+        return Number.isInteger(hours) &&
+            Number.isInteger(minutes) &&
+            hours >= 0 && hours <= 23 &&
+            minutes >= 0 && minutes <= 59
+            ? hours * 60 + minutes
+            : NaN;
     }
 
-
     function formatTime(value) {
+        const minutes = timeToMinutes(value);
 
-        if (!value) {
+        if (!Number.isFinite(minutes)) return "";
 
-            return "";
+        return String(Math.floor(minutes / 60)).padStart(2, "0") +
+            ":" +
+            String(minutes % 60).padStart(2, "0");
+    }
+
+    function getWeeklySchedule(row) {
+        const hasWeekdayHours = WEEK_DAYS.some(day =>
+            row[day.name + "Open"] || row[day.name + "Close"]
+        );
+
+        if (hasWeekdayHours) {
+            return WEEK_DAYS.map(day => ({
+                ...day,
+                open: row[day.name + "Open"] || "",
+                close: row[day.name + "Close"] || ""
+            }));
         }
 
+        if (!row.OpenHour && !row.CloseHour) return null;
 
-        const text =
-            String(value).trim();
+        return WEEK_DAYS.map(day => ({
+            ...day,
+            open: row.OpenHour || "",
+            close: row.CloseHour || ""
+        }));
+    }
 
+    function isValidSchedule(day) {
+        return day &&
+            Number.isFinite(timeToMinutes(day.open)) &&
+            Number.isFinite(timeToMinutes(day.close));
+    }
 
-        if (text.includes(":")) {
+    function getWeeklyHours(row) {
+        const schedule = getWeeklySchedule(row);
 
-            const parts =
-                text.split(":");
+        if (!schedule) return "Hours unavailable";
 
+        return schedule
+            .map(day => {
+                const open = formatTime(day.open);
+                const close = formatTime(day.close);
 
-            const hours =
-                Number(parts[0]);
-
-
-            const minutes =
-                Number(parts[1]);
-
-
-            if (
-                Number.isFinite(hours) &&
-                Number.isFinite(minutes)
-            ) {
-
-                return (
-                    String(hours)
-                        .padStart(2, "0")
-                    +
-                    ":"
-                    +
-                    String(minutes)
-                        .padStart(2, "0")
-                );
-            }
-
-
-            return text;
-        }
-
-
-        const hour =
-            Number(text);
-
-
-        if (
-            Number.isFinite(hour)
-        ) {
-
-            return (
-                String(hour)
-                    .padStart(2, "0")
-                +
-                ":00"
-            );
-        }
-
-
-        return text;
+                return day.label + ": " +
+                    (open && close ? open + " – " + close : "Closed");
+            })
+            .join("\n");
     }
 
 
@@ -944,99 +905,35 @@
        ========================================== */
 
     function getOpenStatus(row) {
+        const schedule = getWeeklySchedule(row);
 
-        const openMinutes =
-            timeToMinutes(
-                row.OpenHour
-            );
-
-
-        const closeMinutes =
-            timeToMinutes(
-                row.CloseHour
-            );
-
-
-        if (
-            !Number.isFinite(openMinutes) ||
-            !Number.isFinite(closeMinutes)
-        ) {
-
-            return {
-
-                isOpen: false,
-
-                known: false
-
-            };
+        if (!schedule) {
+            return { isOpen: false, known: false };
         }
 
+        /* Uses the visitor's browser time, as the original map did. */
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const todayIndex = now.getDay();
+        const today = schedule[todayIndex];
+        const yesterday = schedule[(todayIndex + 6) % 7];
 
-        /*
-         * Prototype:
-         * Uses the visitor's browser time.
-         *
-         * Later we can make this
-         * restaurant-timezone aware.
-         */
+        const isOpenToday = isValidSchedule(today) && (
+            timeToMinutes(today.close) > timeToMinutes(today.open)
+                ? currentMinutes >= timeToMinutes(today.open) &&
+                    currentMinutes < timeToMinutes(today.close)
+                : currentMinutes >= timeToMinutes(today.open) ||
+                    currentMinutes < timeToMinutes(today.close)
+        );
 
-        const now =
-            new Date();
-
-
-        const currentMinutes =
-            now.getHours() * 60 +
-            now.getMinutes();
-
-
-        let isOpen;
-
-
-        /*
-         * Normal opening:
-         *
-         * 11:00 → 21:00
-         */
-
-        if (
-            closeMinutes >
-            openMinutes
-        ) {
-
-            isOpen =
-                currentMinutes >=
-                    openMinutes &&
-                currentMinutes <
-                    closeMinutes;
-
-        }
-
-
-        /*
-         * Overnight opening:
-         *
-         * 18:00 → 02:00
-         */
-
-        else {
-
-            isOpen =
-                currentMinutes >=
-                    openMinutes ||
-                currentMinutes <
-                    closeMinutes;
-
-        }
-
+        const isOpenFromYesterday = isValidSchedule(yesterday) &&
+            timeToMinutes(yesterday.close) <= timeToMinutes(yesterday.open) &&
+            currentMinutes < timeToMinutes(yesterday.close);
 
         return {
-
-            isOpen,
-
-            known: true
-
+            isOpen: isOpenToday || isOpenFromYesterday,
+            known: schedule.some(isValidSchedule)
         };
-
     }
 
 
@@ -1067,13 +964,7 @@
 
             const status = getOpenStatus(row);
 
-            const openTime = formatTime(row.OpenHour);
-            const closeTime = formatTime(row.CloseHour);
-
-            const hours =
-                openTime && closeTime
-                    ? `${openTime} – ${closeTime}`
-                    : "Hours unavailable";
+            const hours = getWeeklyHours(row);
 
             const name =
                 row.Restaurant ||
@@ -1347,7 +1238,8 @@
                 const hours =
                     escapeHTML(
                         properties.hours
-                    );
+                    )
+                        .replace(/\n/g, "<br>");
 
                 const isOpen =
                     Number(
