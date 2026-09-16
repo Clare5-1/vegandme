@@ -1,2348 +1,1665 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>veg&me | Vegetarian Map</title>
+<title>veg&me | Vegetarian Map</title>
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.css"
-    />
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.css"
+/>
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+    * {
+        box-sizing: border-box;
+    }
 
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
 
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                sans-serif;
-        }
-
-
-        /* =========================
-           MAP
-           ========================= */
-
-        #map {
-            width: 100%;
-            height: 100dvh;
-        }
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            sans-serif;
+    }
 
 
-        /* =========================
-           TOP BAR
-           ========================= */
+    /* =========================
+       MAP
+       ========================= */
+
+    #map {
+        width: 100%;
+        height: 100dvh;
+    }
+
+
+    /* =========================
+       TOP BAR
+       ========================= */
+
+    .top-bar {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+
+        z-index: 10;
+
+        padding: 10px 14px;
+
+        background: rgba(255, 255, 255, 0.94);
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 3px 14px rgba(0, 0, 0, 0.12);
+
+        backdrop-filter: blur(8px);
+    }
+
+
+    /* =========================
+       TOP ROW
+       ========================= */
+
+    .top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    /* =========================
+       LOGO
+       ========================= */
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        color: #245c35;
+
+        font-size: 18px;
+        font-weight: 700;
+
+        letter-spacing: -0.3px;
+    }
+
+    .logo-mark {
+        width: 10px;
+        height: 10px;
+
+        border-radius: 50%;
+
+        background: #4caf50;
+    }
+
+
+    /* =========================
+       SEARCH BUTTON
+       ========================= */
+
+    .search-button {
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        border-radius: 50%;
+
+        background: #f2f6f3;
+
+        font-size: 16px;
+
+        cursor: pointer;
+    }
+
+
+    /* =========================
+       CATEGORY FILTERS
+       ========================= */
+
+    .category-row {
+        display: flex;
+
+        gap: 7px;
+
+        margin-top: 10px;
+
+        overflow-x: auto;
+
+        scrollbar-width: none;
+    }
+
+    .category-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-button {
+        flex: 0 0 auto;
+
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        padding: 8px 11px;
+
+        border: 1px solid #e2e8e3;
+
+        border-radius: 20px;
+
+        background: #ffffff;
+
+        color: #4b554e;
+
+        font-size: 12px;
+        font-weight: 600;
+
+        white-space: nowrap;
+
+        cursor: pointer;
+
+        transition:
+            background 0.15s ease,
+            color 0.15s ease,
+            border-color 0.15s ease,
+            transform 0.1s ease;
+    }
+
+    .category-button:hover {
+        border-color: #b9cbbd;
+    }
+
+    .category-button:active {
+        transform: scale(0.97);
+    }
+
+    .category-button.active {
+        background: #245c35;
+
+        border-color: #245c35;
+
+        color: white;
+    }
+
+
+    /* =========================
+       STATUS LEGEND
+       ========================= */
+
+    .legend {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        margin-top: 10px;
+
+        color: #555;
+
+        font-size: 12px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .legend-dot {
+        width: 9px;
+        height: 9px;
+
+        border-radius: 50%;
+    }
+
+    .legend-open {
+        background: #3fae5a;
+    }
+
+    .legend-closed {
+        background: #a7a7a7;
+    }
+
+
+    /* =========================
+       POPUP
+       ========================= */
+
+    .maplibregl-popup-content {
+        padding: 0;
+
+        width: min(290px, calc(100vw - 40px));
+
+        border-radius: 16px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 6px 25px rgba(0, 0, 0, 0.16);
+    }
+
+    .maplibregl-popup-close-button {
+        z-index: 2;
+
+        width: 34px;
+        height: 34px;
+
+        font-size: 22px;
+
+        color: #666;
+    }
+
+    .restaurant-card {
+        padding: 17px;
+    }
+
+    .restaurant-name {
+        padding-right: 20px;
+
+        color: #183c24;
+
+        font-size: 18px;
+        font-weight: 700;
+
+        line-height: 1.3;
+    }
+
+    .restaurant-type {
+        margin-top: 7px;
+
+        color: #555;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+    .restaurant-hours {
+        margin-top: 12px;
+
+        color: #444;
+
+        font-size: 13px;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+
+        margin-top: 10px;
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-open {
+        color: #236b36;
+        background: #e7f5eb;
+    }
+
+    .status-closed {
+        color: #666;
+        background: #eeeeee;
+    }
+
+    .google-button {
+        display: block;
+
+        margin-top: 15px;
+        padding: 11px 13px;
+
+        border-radius: 10px;
+
+        background: #245c35;
+        color: white;
+
+        text-align: center;
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       LOADING
+       ========================= */
+
+    .loading {
+        position: fixed;
+
+        left: 50%;
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        z-index: 20;
+
+        padding: 10px 15px;
+
+        border-radius: 12px;
+
+        background: rgba(255, 255, 255, 0.95);
+
+        box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.12);
+
+        color: #555;
+
+        font-size: 13px;
+
+        text-align: center;
+    }
+
+    .loading.hidden {
+        display: none;
+    }
+
+
+    /* =========================
+       MAP CONTROLS
+       ========================= */
+
+    .maplibregl-ctrl-group {
+        border: none;
+
+        border-radius: 12px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 3px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .maplibregl-ctrl button {
+        width: 42px;
+        height: 42px;
+    }
+
+
+    /* =========================
+       MOBILE
+       ========================= */
+
+    @media (max-width: 600px) {
 
         .top-bar {
-            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
 
-            top: 12px;
-            left: 12px;
-            right: 12px;
-
-            z-index: 10;
-
-            padding: 10px 14px;
-
-            background: rgba(255, 255, 255, 0.94);
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 3px 14px rgba(0, 0, 0, 0.12);
-
-            backdrop-filter: blur(8px);
+            padding: 9px 12px;
         }
-
-
-        /* =========================
-           TOP ROW
-           ========================= */
-
-        .top-row {
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-        }
-
-
-        /* =========================
-           LOGO
-           ========================= */
 
         .logo {
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            color: #245c35;
-
-            font-size: 18px;
-            font-weight: 700;
-
-            letter-spacing: -0.3px;
+            font-size: 17px;
         }
-
-        .logo-mark {
-            width: 10px;
-            height: 10px;
-
-            border-radius: 50%;
-
-            background: #4caf50;
-        }
-
-
-        /* =========================
-           SEARCH BUTTON
-           ========================= */
-
-        .search-button {
-            width: 36px;
-            height: 36px;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            border: none;
-            border-radius: 50%;
-
-            background: #f2f6f3;
-
-            font-size: 16px;
-
-            cursor: pointer;
-        }
-
-
-        /* =========================
-           CATEGORY FILTERS
-           ========================= */
-
-        .category-row {
-            display: flex;
-
-            gap: 7px;
-
-            margin-top: 10px;
-
-            overflow-x: auto;
-
-            scrollbar-width: none;
-        }
-
-        .category-row::-webkit-scrollbar {
-            display: none;
-        }
-
-
-        .category-button {
-            flex: 0 0 auto;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 5px;
-
-            padding: 8px 11px;
-
-            border: 1px solid #e2e8e3;
-
-            border-radius: 20px;
-
-            background: #ffffff;
-
-            color: #4b554e;
-
-            font-size: 12px;
-            font-weight: 600;
-
-            white-space: nowrap;
-
-            cursor: pointer;
-
-            transition:
-                background 0.15s ease,
-                color 0.15s ease,
-                border-color 0.15s ease,
-                transform 0.1s ease;
-        }
-
-        .category-button:hover {
-            border-color: #b9cbbd;
-        }
-
-        .category-button:active {
-            transform: scale(0.97);
-        }
-
-        .category-button.active {
-            background: #245c35;
-
-            border-color: #245c35;
-
-            color: white;
-        }
-
-
-        /* =========================
-           STATUS LEGEND
-           ========================= */
 
         .legend {
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            margin-top: 10px;
-
-            color: #555;
-
-            font-size: 12px;
+            font-size: 11px;
         }
+    }
 
-        .legend-item {
-            display: flex;
-
-            align-items: center;
-
-            gap: 4px;
-        }
-
-        .legend-dot {
-            width: 9px;
-            height: 9px;
-
-            border-radius: 50%;
-        }
-
-        .legend-open {
-            background: #3fae5a;
-        }
-
-        .legend-closed {
-            background: #a7a7a7;
-        }
-
-
-        /* =========================
-           POPUP
-           ========================= */
-
-        .maplibregl-popup-content {
-            padding: 0;
-
-            width: min(300px, calc(100vw - 40px));
-
-            border-radius: 16px;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 6px 25px rgba(0, 0, 0, 0.16);
-        }
-
-        .maplibregl-popup-close-button {
-            z-index: 2;
-
-            width: 34px;
-            height: 34px;
-
-            font-size: 22px;
-
-            color: #666;
-        }
-
-
-        .restaurant-card {
-            padding: 17px;
-        }
-
-
-        /* =========================
-           POPUP HEADER
-           ========================= */
-
-        .restaurant-header {
-            display: flex;
-
-            align-items: flex-start;
-
-            justify-content: space-between;
-
-            gap: 10px;
-        }
-
-        .restaurant-name {
-            padding-right: 4px;
-
-            color: #183c24;
-
-            font-size: 18px;
-            font-weight: 700;
-
-            line-height: 1.3;
-        }
-
-
-        /* =========================
-           GOOGLE MAPS BUTTON
-           ========================= */
-
-        .google-button {
-            flex: 0 0 auto;
-
-            width: 34px;
-            height: 34px;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background: #f2f6f3;
-
-            color: #245c35;
-
-            text-decoration: none;
-
-            font-size: 17px;
-
-            transition:
-                background 0.15s ease,
-                transform 0.1s ease;
-        }
-
-        .google-button:hover {
-            background: #e5eee7;
-        }
-
-        .google-button:active {
-            transform: scale(0.95);
-        }
-
-
-        /* =========================
-           RESTAURANT TYPE
-           ========================= */
-
-        .restaurant-type {
-            margin-top: 7px;
-
-            color: #555;
-
-            font-size: 13px;
-
-            line-height: 1.5;
-        }
-
-
-        /* =========================
-           CURRENT STATUS
-           ========================= */
-
-        .status {
-            display: inline-flex;
-
-            align-items: center;
-
-            margin-top: 12px;
-
-            padding: 5px 9px;
-
-            border-radius: 20px;
-
-            font-size: 12px;
-            font-weight: 600;
-
-            line-height: 1.2;
-        }
-
-        .status-open {
-            color: #236b36;
-
-            background: #e7f5eb;
-        }
-
-        .status-closed {
-            color: #666;
-
-            background: #eeeeee;
-        }
-
-
-        /* =========================
-           WEEKLY HOURS
-           ========================= */
-
-        .restaurant-hours {
-            margin-top: 10px;
-
-            color: #444;
-
-            font-size: 12px;
-
-            line-height: 1.65;
-        }
-
-        .hours-row {
-            display: flex;
-
-            justify-content: space-between;
-
-            gap: 12px;
-        }
-
-        .hours-day {
-            color: #666;
-
-            min-width: 54px;
-        }
-
-        .hours-time {
-            text-align: right;
-
-            color: #444;
-        }
-
-
-        /* =========================
-           LOADING
-           ========================= */
-
-        .loading {
-            position: fixed;
-
-            left: 50%;
-            top: 50%;
-
-            transform: translate(-50%, -50%);
-
-            z-index: 20;
-
-            padding: 10px 15px;
-
-            border-radius: 12px;
-
-            background: rgba(255, 255, 255, 0.95);
-
-            box-shadow:
-                0 4px 20px rgba(0, 0, 0, 0.12);
-
-            color: #555;
-
-            font-size: 13px;
-
-            text-align: center;
-        }
-
-        .loading.hidden {
-            display: none;
-        }
-
-
-        /* =========================
-           MAP CONTROLS
-           ========================= */
-
-        .maplibregl-ctrl-group {
-            border: none;
-
-            border-radius: 12px;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 3px 12px rgba(0, 0, 0, 0.12);
-        }
-
-        .maplibregl-ctrl button {
-            width: 42px;
-            height: 42px;
-        }
-
-
-        /* =========================
-           MOBILE
-           ========================= */
-
-        @media (max-width: 600px) {
-
-            .top-bar {
-                top: 10px;
-                left: 10px;
-                right: 10px;
-
-                padding: 9px 12px;
-            }
-
-            .logo {
-                font-size: 17px;
-            }
-
-            .legend {
-                font-size: 11px;
-            }
-
-            .restaurant-card {
-                padding: 16px;
-            }
-
-            .restaurant-name {
-                font-size: 17px;
-            }
-        }
-
-    </style>
+</style>
 
 </head>
 
-
 <body>
 
+<!-- =========================
+     TOP BAR
+     ========================= -->
 
-    <!-- =========================
-         TOP BAR
-         ========================= -->
+<div class="top-bar">
 
-    <div class="top-bar">
+    <div class="top-row">
 
-        <div class="top-row">
-
-            <div class="logo">
-                <span class="logo-mark"></span>
-                veg&me
-            </div>
-
-            <button
-                id="search-button"
-                class="search-button"
-                aria-label="Search"
-                title="Search"
-            >
-                🔍
-            </button>
-
+        <div class="logo">
+            <span class="logo-mark"></span>
+            veg&me
         </div>
 
-
-        <!-- =========================
-             CATEGORY FILTERS
-             ========================= -->
-
-        <div class="category-row">
-
-            <button
-                class="category-button active"
-                data-category="all"
-            >
-                🌱
-                <span>All</span>
-            </button>
-
-
-            <button
-                class="category-button"
-                data-category="vegan"
-            >
-                🌱
-                <span>Pure Vegan</span>
-            </button>
-
-
-            <button
-                class="category-button"
-                data-category="lacto-ovo"
-            >
-                🥚
-                <span>Lacto-Ovo</span>
-            </button>
-
-
-            <button
-                class="category-button"
-                data-category="no-alliums"
-            >
-                🌿
-                <span>No Alliums</span>
-            </button>
-
-
-            <button
-                class="category-button"
-                data-category="dessert"
-            >
-                🍰
-                <span>Dessert</span>
-            </button>
-
-        </div>
-
-
-        <!-- =========================
-             STATUS LEGEND
-             ========================= -->
-
-        <div class="legend">
-
-            <div class="legend-item">
-                <span class="legend-dot legend-open"></span>
-                Open
-            </div>
-
-            <div class="legend-item">
-                <span class="legend-dot legend-closed"></span>
-                Closed
-            </div>
-
-        </div>
+        <button
+            id="search-button"
+            class="search-button"
+            aria-label="Search"
+        >
+            🔍
+        </button>
 
     </div>
 
 
-    <!-- =========================
-         MAP
-         ========================= -->
+    <div class="category-row">
 
-    <div id="map"></div>
+        <button
+            class="category-button active"
+            data-category="all"
+        >
+            🌱
+            <span>All</span>
+        </button>
 
+        <button
+            class="category-button"
+            data-category="vegan"
+        >
+            🌱
+            <span>Pure Vegan</span>
+        </button>
 
-    <!-- =========================
-         LOADING
-         ========================= -->
+        <button
+            class="category-button"
+            data-category="lacto-ovo"
+        >
+            🥚
+            <span>Lacto-Ovo</span>
+        </button>
 
-    <div id="loading" class="loading">
-        Loading map...
+        <button
+            class="category-button"
+            data-category="no-alliums"
+        >
+            🌿
+            <span>No Alliums</span>
+        </button>
+
+        <button
+            class="category-button"
+            data-category="dessert"
+        >
+            🍰
+            <span>Dessert</span>
+        </button>
+
     </div>
 
 
-    <!-- =========================
-         MAPLIBRE
-         ========================= -->
+    <div class="legend">
 
-    <script type="module">
+        <div class="legend-item">
+            <span class="legend-dot legend-open"></span>
+            Open
+        </div>
 
-        import * as maplibregl from
-            "https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.mjs";
+        <div class="legend-item">
+            <span class="legend-dot legend-closed"></span>
+            Closed
+        </div>
 
+    </div>
 
-        /* ==========================================
-           CONFIGURATION
-           ========================================== */
-
-        const GOOGLE_SHEET_CSV =
-            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFyCfwrZTOpDkmpHsU2qlNmnVltRGxs0TZLbvRB0EL3d-donR3HdkY1vR4bBFxQtN2X_D0D2c5KW5n/pub?output=csv";
-
-
-        /* ==========================================
-           MAP
-           ========================================== */
-
-        const map = new maplibregl.Map({
-
-            container: "map",
-
-            style:
-                "https://tiles.openfreemap.org/styles/bright",
-
-            center: [121.0, 23.7],
-
-            zoom: 7.5,
-
-            minZoom: 2,
-
-            maxZoom: 18,
-
-            attributionControl: true
-
-        });
+</div>
 
 
-        /* ==========================================
-           MAP CONTROLS
-           ========================================== */
+<!-- =========================
+     MAP
+     ========================= -->
 
-        map.addControl(
-            new maplibregl.NavigationControl({
-                showCompass: false
-            }),
-            "bottom-right"
-        );
+<div id="map"></div>
 
 
-        /* ==========================================
-           LOADING
-           ========================================== */
+<!-- =========================
+     LOADING
+     ========================= -->
 
-        const loading =
-            document.getElementById("loading");
-
-
-        /* ==========================================
-           CSV PARSER
-           ========================================== */
-
-        function parseCSV(text) {
-
-            const rows = [];
-
-            let row = [];
-
-            let value = "";
-
-            let insideQuotes = false;
+<div id="loading" class="loading">
+    Loading map...
+</div>
 
 
-            for (
-                let i = 0;
-                i < text.length;
-                i++
+<!-- =========================
+     MAPLIBRE
+     ========================= -->
+
+<script type="module">
+
+    import * as maplibregl from
+        "https://unpkg.com/maplibre-gl@6.9.0/dist/maplibre-gl.mjs";
+
+
+    /* ==========================================
+       CONFIGURATION
+       ========================================== */
+
+    const GOOGLE_SHEET_CSV =
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFyCfwrZTOpDkmpHsU2qlNmnVltRGxs0TZLbvRB0EL3d-donR3HdkY1vR4bBFxQtN2X_D0D2c5KW5n/pub?output=csv";
+
+
+    /* ==========================================
+       MAP
+       ========================================== */
+
+    const map = new maplibregl.Map({
+
+        container: "map",
+
+        style:
+            "https://tiles.openfreemap.org/styles/bright",
+
+        center: [121.0, 23.7],
+
+        zoom: 7.5,
+
+        minZoom: 2,
+
+        maxZoom: 18,
+
+        attributionControl: true
+
+    });
+
+
+    /* ==========================================
+       MAP CONTROLS
+       ========================================== */
+
+    map.addControl(
+        new maplibregl.NavigationControl({
+            showCompass: false
+        }),
+        "bottom-right"
+    );
+
+
+    /* ==========================================
+       LOADING
+       ========================================== */
+
+    const loading =
+        document.getElementById("loading");
+
+
+    /* ==========================================
+       CSV PARSER
+       ========================================== */
+
+    function parseCSV(text) {
+
+        const rows = [];
+
+        let row = [];
+
+        let value = "";
+
+        let insideQuotes = false;
+
+
+        for (
+            let i = 0;
+            i < text.length;
+            i++
+        ) {
+
+            const char = text[i];
+
+            const next = text[i + 1];
+
+
+            if (
+                char === '"' &&
+                insideQuotes &&
+                next === '"'
             ) {
 
-                const char = text[i];
+                value += '"';
 
-                const next = text[i + 1];
+                i++;
 
-
-                if (
-                    char === '"' &&
-                    insideQuotes &&
-                    next === '"'
-                ) {
-
-                    value += '"';
-
-                    i++;
-
-                    continue;
-                }
+                continue;
+            }
 
 
-                if (char === '"') {
+            if (char === '"') {
 
-                    insideQuotes =
-                        !insideQuotes;
+                insideQuotes =
+                    !insideQuotes;
 
-                    continue;
-                }
-
-
-                if (
-                    char === "," &&
-                    !insideQuotes
-                ) {
-
-                    row.push(value);
-
-                    value = "";
-
-                    continue;
-                }
-
-
-                if (
-                    (char === "\n" ||
-                     char === "\r") &&
-                    !insideQuotes
-                ) {
-
-                    if (
-                        char === "\r" &&
-                        next === "\n"
-                    ) {
-
-                        i++;
-                    }
-
-
-                    row.push(value);
-
-                    rows.push(row);
-
-                    row = [];
-
-                    value = "";
-
-                    continue;
-                }
-
-
-                value += char;
+                continue;
             }
 
 
             if (
-                value.length > 0 ||
-                row.length > 0
+                char === "," &&
+                !insideQuotes
             ) {
 
                 row.push(value);
 
-                rows.push(row);
-            }
+                value = "";
 
-
-            if (rows.length === 0) {
-                return [];
-            }
-
-
-            const headers =
-                rows[0].map(
-                    header => header.trim()
-                );
-
-
-            return rows
-                .slice(1)
-
-                .filter(row =>
-                    row.some(
-                        cell =>
-                            cell.trim() !== ""
-                    )
-                )
-
-                .map(row => {
-
-                    const object = {};
-
-
-                    headers.forEach(
-                        (header, index) => {
-
-                            object[header] =
-                                (
-                                    row[index] ||
-                                    ""
-                                ).trim();
-
-                        }
-                    );
-
-
-                    return object;
-
-                });
-
-        }
-
-
-        /* ==========================================
-           TEXT HELPERS
-           ========================================== */
-
-        function escapeHTML(value) {
-
-            return String(value || "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-
-        }
-
-
-        /* ==========================================
-           CATEGORY HELPERS
-           ========================================== */
-
-        function translateCategory(code) {
-
-            const categories = {
-
-                v: "🌱 Pure Vegan · 全素",
-
-                l: "🥚 Lacto-Ovo · 蛋奶素",
-
-                n: "🌿 No Alliums · 植物五辛素",
-
-                d: "🍰 Dessert · 甜品"
-
-            };
-
-
-            return categories[code] || "";
-
-        }
-
-
-        function getCategoryCodes(value) {
-
-            if (!value) {
-                return [];
-            }
-
-
-            return String(value)
-
-                .toLowerCase()
-
-                .split(",")
-
-                .map(code =>
-                    code.trim()
-                )
-
-                .filter(code =>
-                    ["v", "l", "n", "d"]
-                        .includes(code)
-                );
-
-        }
-
-
-        /* ==========================================
-           OPENING HOURS
-           ========================================== */
-
-        /*
-         * Google Sheet weekday columns:
-         *
-         * MondayOpen, MondayClose
-         * TuesdayOpen, TuesdayClose
-         * ...
-         * SundayOpen, SundayClose
-         *
-         * Leave a pair blank when closed that day.
-         *
-         * OpenHour and CloseHour remain as a
-         * fallback for older rows.
-         */
-
-        const WEEK_DAYS = [
-
-            {
-                name: "Sunday",
-                label: "Sun"
-            },
-
-            {
-                name: "Monday",
-                label: "Mon"
-            },
-
-            {
-                name: "Tuesday",
-                label: "Tue"
-            },
-
-            {
-                name: "Wednesday",
-                label: "Wed"
-            },
-
-            {
-                name: "Thursday",
-                label: "Thu"
-            },
-
-            {
-                name: "Friday",
-                label: "Fri"
-            },
-
-            {
-                name: "Saturday",
-                label: "Sat"
-            }
-
-        ];
-
-
-        function timeToMinutes(value) {
-
-            if (!value) {
-                return NaN;
-            }
-
-
-            const text =
-                String(value).trim();
-
-
-            const parts =
-                text.includes(":")
-                    ? text.split(":")
-                    : [text, "0"];
-
-
-            const hours =
-                Number(parts[0]);
-
-
-            const minutes =
-                Number(parts[1]);
-
-
-            return Number.isInteger(hours) &&
-                Number.isInteger(minutes) &&
-                hours >= 0 &&
-                hours <= 23 &&
-                minutes >= 0 &&
-                minutes <= 59
-
-                ? hours * 60 + minutes
-
-                : NaN;
-
-        }
-
-
-        function formatTime(value) {
-
-            const minutes =
-                timeToMinutes(value);
-
-
-            if (!Number.isFinite(minutes)) {
-                return "";
-            }
-
-
-            return (
-                String(
-                    Math.floor(minutes / 60)
-                ).padStart(2, "0")
-
-                +
-
-                ":" +
-
-                String(
-                    minutes % 60
-                ).padStart(2, "0")
-            );
-
-        }
-
-
-        function getWeeklySchedule(row) {
-
-            const hasWeekdayHours =
-                WEEK_DAYS.some(day =>
-                    row[day.name + "Open"] ||
-                    row[day.name + "Close"]
-                );
-
-
-            if (hasWeekdayHours) {
-
-                return WEEK_DAYS.map(day => ({
-
-                    ...day,
-
-                    open:
-                        row[day.name + "Open"] ||
-                        "",
-
-                    close:
-                        row[day.name + "Close"] ||
-                        ""
-
-                }));
-
+                continue;
             }
 
 
             if (
-                !row.OpenHour &&
-                !row.CloseHour
+                (char === "\n" ||
+                 char === "\r") &&
+                !insideQuotes
             ) {
 
-                return null;
-            }
-
-
-            return WEEK_DAYS.map(day => ({
-
-                ...day,
-
-                open:
-                    row.OpenHour || "",
-
-                close:
-                    row.CloseHour || ""
-
-            }));
-
-        }
-
-
-        function isValidSchedule(day) {
-
-            return day &&
-
-                Number.isFinite(
-                    timeToMinutes(day.open)
-                ) &&
-
-                Number.isFinite(
-                    timeToMinutes(day.close)
-                );
-
-        }
-
-
-        /* ==========================================
-           GROUP MATCHING DAYS
-           ========================================== */
-
-        function getGroupedHours(row) {
-
-            const schedule =
-                getWeeklySchedule(row);
-
-
-            if (!schedule) {
-                return [];
-            }
-
-
-            const groups = [];
-
-
-            let currentGroup = null;
-
-
-            schedule.forEach(day => {
-
-                const open =
-                    formatTime(day.open);
-
-                const close =
-                    formatTime(day.close);
-
-
-                const time =
-                    open && close
-                        ? `${open} – ${close}`
-                        : "Closed";
-
-
                 if (
-                    currentGroup &&
-                    currentGroup.time === time
+                    char === "\r" &&
+                    next === "\n"
                 ) {
 
-                    currentGroup.days.push(
-                        day.label
-                    );
+                    i++;
+                }
 
-                } else {
 
-                    currentGroup = {
+                row.push(value);
 
-                        days: [day.label],
+                rows.push(row);
 
-                        time: time
+                row = [];
 
-                    };
+                value = "";
 
-                    groups.push(currentGroup);
+                continue;
+            }
+
+
+            value += char;
+        }
+
+
+        if (
+            value.length > 0 ||
+            row.length > 0
+        ) {
+
+            row.push(value);
+
+            rows.push(row);
+        }
+
+
+        if (rows.length === 0) {
+
+            return [];
+        }
+
+
+        const headers =
+            rows[0].map(
+                header => header.trim()
+            );
+
+
+        return rows
+            .slice(1)
+
+            .filter(row =>
+                row.some(
+                    cell =>
+                        cell.trim() !== ""
+                )
+            )
+
+            .map(row => {
+
+                const object = {};
+
+
+                headers.forEach(
+                    (header, index) => {
+
+                        object[header] =
+                            (
+                                row[index] ||
+                                ""
+                            ).trim();
+
+                    }
+                );
+
+
+                return object;
+
+            });
+
+    }
+
+
+    /* ==========================================
+       TEXT HELPERS
+       ========================================== */
+
+    function escapeHTML(value) {
+
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* ==========================================
+       CATEGORY HELPERS
+       ========================================== */
+
+    function translateCategory(code) {
+
+        const categories = {
+
+            v: "🌱 Pure Vegan · 全素",
+
+            l: "🥚 Lacto-Ovo · 蛋奶素",
+
+            n: "🌿 No Alliums · 植物五辛素",
+
+            d: "🍰 Dessert · 甜品"
+
+        };
+
+
+        return categories[code] || "";
+
+    }
+
+
+    function getCategoryCodes(value) {
+
+        if (!value) {
+
+            return [];
+        }
+
+
+        return String(value)
+
+            .toLowerCase()
+
+            .split(",")
+
+            .map(code =>
+                code.trim()
+            )
+
+            .filter(code =>
+                ["v", "l", "n", "d"]
+                    .includes(code)
+            );
+
+    }
+
+
+    /* ==========================================
+       OPENING HOURS
+       ========================================== */
+
+    /*
+     * Google Sheet weekday columns:
+     * MondayOpen, MondayClose ... SundayOpen, SundayClose
+     * Leave a pair blank when the restaurant is closed that day.
+     * OpenHour and CloseHour remain as a fallback for existing rows.
+     */
+    const WEEK_DAYS = [
+        { name: "Sunday", label: "Sun" },
+        { name: "Monday", label: "Mon" },
+        { name: "Tuesday", label: "Tue" },
+        { name: "Wednesday", label: "Wed" },
+        { name: "Thursday", label: "Thu" },
+        { name: "Friday", label: "Fri" },
+        { name: "Saturday", label: "Sat" }
+    ];
+
+    function timeToMinutes(value) {
+        if (!value) return NaN;
+
+        const text = String(value).trim();
+        const parts = text.includes(":") ? text.split(":") : [text, "0"];
+        const hours = Number(parts[0]);
+        const minutes = Number(parts[1]);
+
+        return Number.isInteger(hours) &&
+            Number.isInteger(minutes) &&
+            hours >= 0 && hours <= 23 &&
+            minutes >= 0 && minutes <= 59
+            ? hours * 60 + minutes
+            : NaN;
+    }
+
+    function formatTime(value) {
+        const minutes = timeToMinutes(value);
+
+        if (!Number.isFinite(minutes)) return "";
+
+        return String(Math.floor(minutes / 60)).padStart(2, "0") +
+            ":" +
+            String(minutes % 60).padStart(2, "0");
+    }
+
+    function getWeeklySchedule(row) {
+        const hasWeekdayHours = WEEK_DAYS.some(day =>
+            row[day.name + "Open"] || row[day.name + "Close"]
+        );
+
+        if (hasWeekdayHours) {
+            return WEEK_DAYS.map(day => ({
+                ...day,
+                open: row[day.name + "Open"] || "",
+                close: row[day.name + "Close"] || ""
+            }));
+        }
+
+        if (!row.OpenHour && !row.CloseHour) return null;
+
+        return WEEK_DAYS.map(day => ({
+            ...day,
+            open: row.OpenHour || "",
+            close: row.CloseHour || ""
+        }));
+    }
+
+    function isValidSchedule(day) {
+        return day &&
+            Number.isFinite(timeToMinutes(day.open)) &&
+            Number.isFinite(timeToMinutes(day.close));
+    }
+
+    function getWeeklyHours(row) {
+        const schedule = getWeeklySchedule(row);
+
+        if (!schedule) return "Hours unavailable";
+
+        return schedule
+            .map(day => {
+                const open = formatTime(day.open);
+                const close = formatTime(day.close);
+
+                return day.label + ": " +
+                    (open && close ? open + " – " + close : "Closed");
+            })
+            .join("\n");
+    }
+
+
+    /* ==========================================
+       OPENING STATUS
+       ========================================== */
+
+    function getOpenStatus(row) {
+        const schedule = getWeeklySchedule(row);
+
+        if (!schedule) {
+            return { isOpen: false, known: false };
+        }
+
+        /* Uses the visitor's browser time, as the original map did. */
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const todayIndex = now.getDay();
+        const today = schedule[todayIndex];
+        const yesterday = schedule[(todayIndex + 6) % 7];
+
+        const isOpenToday = isValidSchedule(today) && (
+            timeToMinutes(today.close) > timeToMinutes(today.open)
+                ? currentMinutes >= timeToMinutes(today.open) &&
+                    currentMinutes < timeToMinutes(today.close)
+                : currentMinutes >= timeToMinutes(today.open) ||
+                    currentMinutes < timeToMinutes(today.close)
+        );
+
+        const isOpenFromYesterday = isValidSchedule(yesterday) &&
+            timeToMinutes(yesterday.close) <= timeToMinutes(yesterday.open) &&
+            currentMinutes < timeToMinutes(yesterday.close);
+
+        return {
+            isOpen: isOpenToday || isOpenFromYesterday,
+            known: schedule.some(isValidSchedule)
+        };
+    }
+
+
+    /* ==========================================
+       CREATE GEOJSON
+       ========================================== */
+
+   /* ==========================================
+       CREATE GEOJSON
+       ========================================== */
+
+    function createGeoJSON(rows) {
+
+        const features = [];
+
+        for (const row of rows) {
+
+            const latitude = Number(row.Latitude);
+            const longitude = Number(row.Longitude);
+
+            if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude)
+            ) {
+                console.warn("Invalid coordinates:", row);
+                continue;
+            }
+
+            const status = getOpenStatus(row);
+
+            const hours = getWeeklyHours(row);
+
+            const name =
+                row.Restaurant ||
+                "Vegetarian restaurant";
+
+            const categoryCodes =
+                getCategoryCodes(row.Categories);
+
+            const categoryLabels =
+                categoryCodes
+                    .map(code => translateCategory(code))
+                    .filter(Boolean)
+                    .join(" · ");
+
+            const googleMapsURL =
+                row.GoogleMaps || "";
+
+            features.push({
+
+                type: "Feature",
+
+                geometry: {
+
+                    type: "Point",
+
+                    coordinates: [
+                        longitude,
+                        latitude
+                    ]
+
+                },
+
+                properties: {
+
+                    name: name,
+
+                    categories:
+                        categoryCodes.join(","),
+
+                    categoryLabels:
+                        categoryLabels,
+
+                    hasVegan:
+                        categoryCodes.includes("v")
+                            ? 1
+                            : 0,
+
+                    hasLactoOvo:
+                        categoryCodes.includes("l")
+                            ? 1
+                            : 0,
+
+                    hasNoAlliums:
+                        categoryCodes.includes("n")
+                            ? 1
+                            : 0,
+
+                    hasDessert:
+                        categoryCodes.includes("d")
+                            ? 1
+                            : 0,
+
+                    hours: hours,
+
+                    isOpen:
+                        status.isOpen
+                            ? 1
+                            : 0,
+
+                    statusKnown:
+                        status.known
+                            ? 1
+                            : 0,
+
+                    googleMapsURL:
+                        googleMapsURL
+
+                }
+
+            });
+
+        }
+
+        return {
+
+            type: "FeatureCollection",
+
+            features: features
+
+        };
+
+    }
+
+
+    /* ==========================================
+       LOAD RESTAURANTS
+       ========================================== */
+
+    async function loadRestaurants() {
+
+        console.log("Loading Google Sheet...");
+
+        console.log(
+            "CSV URL:",
+            GOOGLE_SHEET_CSV
+        );
+
+        try {
+
+            const response =
+                await fetch(
+                    GOOGLE_SHEET_CSV
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Google Sheet request failed: ${response.status}`
+                );
+
+            }
+
+            const csv =
+                await response.text();
+
+            console.log(
+                "CSV received:",
+                csv.substring(0, 300)
+            );
+
+            const rows =
+                parseCSV(csv);
+
+            console.log(
+                "CSV rows:",
+                rows.length
+            );
+
+            if (rows.length === 0) {
+
+                throw new Error(
+                    "Google Sheet returned no restaurant rows."
+                );
+
+            }
+
+            console.log(
+                "First row:",
+                rows[0]
+            );
+
+            const geojson =
+                createGeoJSON(rows);
+
+            console.log(
+                "Restaurants loaded:",
+                geojson.features.length
+            );
+
+            if (geojson.features.length === 0) {
+
+                throw new Error(
+                    "No valid restaurant coordinates were found."
+                );
+
+            }
+
+
+            /* ==================================
+               ADD SOURCE
+               ================================== */
+
+            map.addSource(
+                "restaurants",
+                {
+
+                    type: "geojson",
+
+                    data: geojson
+
+                }
+            );
+
+
+            /* ==================================
+               OPEN RESTAURANTS
+               ================================== */
+
+            map.addLayer({
+
+                id: "restaurants-open",
+
+                type: "circle",
+
+                source: "restaurants",
+
+                filter: [
+                    "==",
+                    ["get", "isOpen"],
+                    1
+                ],
+
+                paint: {
+
+                    "circle-radius": 7,
+
+                    "circle-color": "#3fae5a",
+
+                    "circle-stroke-color": "#ffffff",
+
+                    "circle-stroke-width": 2
 
                 }
 
             });
 
 
-            return groups;
+            /* ==================================
+               CLOSED RESTAURANTS
+               ================================== */
 
-        }
+            map.addLayer({
 
+                id: "restaurants-closed",
 
-        function formatDayGroup(days) {
+                type: "circle",
 
-            if (days.length === 1) {
-                return days[0];
-            }
+                source: "restaurants",
 
+                filter: [
+                    "==",
+                    ["get", "isOpen"],
+                    0
+                ],
 
-            if (days.length === 2) {
-                return `${days[0]} & ${days[1]}`;
-            }
+                paint: {
 
+                    "circle-radius": 7,
 
-            return `${days[0]}–${days[days.length - 1]}`;
+                    "circle-color": "#a7a7a7",
 
-        }
+                    "circle-stroke-color": "#ffffff",
 
-
-        function getWeeklyHoursHTML(row) {
-
-            const groups =
-                getGroupedHours(row);
-
-
-            if (!groups.length) {
-
-                return `
-                    <div class="hours-row">
-                        <span class="hours-day">
-                            Hours
-                        </span>
-
-                        <span class="hours-time">
-                            Hours unavailable
-                        </span>
-                    </div>
-                `;
-
-            }
-
-
-            return groups
-                .map(group => {
-
-                    return `
-                        <div class="hours-row">
-
-                            <span class="hours-day">
-                                ${escapeHTML(
-                                    formatDayGroup(
-                                        group.days
-                                    )
-                                )}
-                            </span>
-
-                            <span class="hours-time">
-                                ${escapeHTML(
-                                    group.time
-                                )}
-                            </span>
-
-                        </div>
-                    `;
-
-                })
-                .join("");
-
-        }
-
-
-        /* ==========================================
-           OPENING STATUS
-           ========================================== */
-
-        function getOpenStatus(row) {
-
-            const schedule =
-                getWeeklySchedule(row);
-
-
-            if (!schedule) {
-
-                return {
-
-                    isOpen: false,
-
-                    known: false,
-
-                    message: "Hours unavailable"
-
-                };
-
-            }
-
-
-            const now =
-                new Date();
-
-
-            const currentMinutes =
-                now.getHours() * 60 +
-                now.getMinutes();
-
-
-            const todayIndex =
-                now.getDay();
-
-
-            const today =
-                schedule[todayIndex];
-
-
-            const yesterday =
-                schedule[
-                    (todayIndex + 6) % 7
-                ];
-
-
-            const todayOpen =
-                timeToMinutes(
-                    today?.open
-                );
-
-
-            const todayClose =
-                timeToMinutes(
-                    today?.close
-                );
-
-
-            const yesterdayOpen =
-                timeToMinutes(
-                    yesterday?.open
-                );
-
-
-            const yesterdayClose =
-                timeToMinutes(
-                    yesterday?.close
-                );
-
-
-            let isOpenToday = false;
-
-
-            if (
-                Number.isFinite(todayOpen) &&
-                Number.isFinite(todayClose)
-            ) {
-
-                if (todayClose > todayOpen) {
-
-                    isOpenToday =
-                        currentMinutes >= todayOpen &&
-                        currentMinutes < todayClose;
-
-                } else {
-
-                    isOpenToday =
-                        currentMinutes >= todayOpen ||
-                        currentMinutes < todayClose;
+                    "circle-stroke-width": 2
 
                 }
 
-            }
+            });
 
 
-            const isOpenFromYesterday =
-                Number.isFinite(yesterdayOpen) &&
-                Number.isFinite(yesterdayClose) &&
-                yesterdayClose <= yesterdayOpen &&
-                currentMinutes < yesterdayClose;
+            /* ==================================
+               POPUP
+               ================================== */
 
+            function showRestaurantPopup(feature) {
 
-            const isOpen =
-                isOpenToday ||
-                isOpenFromYesterday;
-
-
-            if (isOpen) {
-
-                if (
-                    Number.isFinite(todayClose) &&
-                    todayClose > currentMinutes &&
-                    todayClose > todayOpen
-                ) {
-
-                    return {
-
-                        isOpen: true,
-
-                        known: true,
-
-                        message:
-                            `Open now · Closes ${formatTime(
-                                today.close
-                            )}`
-
-                    };
-
-                }
-
-
-                return {
-
-                    isOpen: true,
-
-                    known: true,
-
-                    message: "Open now"
-
-                };
-
-            }
-
-
-            /*
-             * Find the next day on which the
-             * restaurant opens.
-             */
-
-            for (
-                let offset = 0;
-                offset < 7;
-                offset++
-            ) {
-
-                const index =
-                    (todayIndex + offset) % 7;
-
-
-                const day =
-                    schedule[index];
-
-
-                if (
-                    !isValidSchedule(day)
-                ) {
-                    continue;
-                }
-
-
-                const open =
-                    timeToMinutes(day.open);
-
-
-                if (
-                    offset === 0 &&
-                    open > currentMinutes
-                ) {
-
-                    return {
-
-                        isOpen: false,
-
-                        known: true,
-
-                        message:
-                            `Closed · Opens ${formatTime(
-                                day.open
-                            )}`
-
-                    };
-
-                }
-
-
-                if (offset > 0) {
-
-                    const dayName =
-                        offset === 1
-                            ? "tomorrow"
-                            : day.label;
-
-
-                    return {
-
-                        isOpen: false,
-
-                        known: true,
-
-                        message:
-                            `Closed · Opens ${dayName} ${formatTime(
-                                day.open
-                            )}`
-
-                    };
-
-                }
-
-            }
-
-
-            return {
-
-                isOpen: false,
-
-                known: true,
-
-                message: "Closed"
-
-            };
-
-        }
-
-
-        /* ==========================================
-           CREATE GEOJSON
-           ========================================== */
-
-        function createGeoJSON(rows) {
-
-            const features = [];
-
-
-            for (const row of rows) {
-
-                const latitude =
-                    Number(row.Latitude);
-
-
-                const longitude =
-                    Number(row.Longitude);
-
-
-                if (
-                    !Number.isFinite(latitude) ||
-                    !Number.isFinite(longitude)
-                ) {
-
-                    console.warn(
-                        "Invalid coordinates:",
-                        row
-                    );
-
-                    continue;
-                }
-
-
-                const status =
-                    getOpenStatus(row);
-
+                const properties =
+                    feature.properties;
 
                 const name =
-                    row.Restaurant ||
-                    "Vegetarian restaurant";
-
-
-                const categoryCodes =
-                    getCategoryCodes(
-                        row.Categories
+                    escapeHTML(
+                        properties.name
                     );
 
-
                 const categoryLabels =
-                    categoryCodes
+                    escapeHTML(
+                        properties.categoryLabels ||
+                        "Vegetarian"
+                    );
 
-                        .map(code =>
-                            translateCategory(code)
-                        )
+                const hours =
+                    escapeHTML(
+                        properties.hours
+                    )
+                        .replace(/\n/g, "<br>");
 
-                        .filter(Boolean)
-
-                        .join(" · ");
-
+                const isOpen =
+                    Number(
+                        properties.isOpen
+                    ) === 1;
 
                 const googleMapsURL =
-                    row.GoogleMaps || "";
+                    properties.googleMapsURL || "";
 
+                const statusHTML =
+                    isOpen
 
-                features.push({
+                        ? `
+                            <div class="status status-open">
+                                ● Open
+                            </div>
+                          `
 
-                    type: "Feature",
+                        : `
+                            <div class="status status-closed">
+                                ● Closed
+                            </div>
+                          `;
 
+                const mapsButton =
+                    googleMapsURL
 
-                    geometry: {
+                        ? `
+                            <a
+                                class="google-button"
+                                href="${escapeHTML(googleMapsURL)}"
+                                target="_blank"
+                                rel="noopener"
+                            >
+                                Open in Google Maps
+                            </a>
+                          `
 
-                        type: "Point",
+                        : "";
 
-                        coordinates: [
-                            longitude,
-                            latitude
-                        ]
+                const popupHTML = `
 
-                    },
+                    <div class="restaurant-card">
 
+                        <div class="restaurant-name">
+                            ${name}
+                        </div>
 
-                    properties: {
+                        <div class="restaurant-type">
+                            ${categoryLabels}
+                        </div>
 
-                        name: name,
+                        <div class="restaurant-hours">
+                            🕐 ${hours}
+                        </div>
 
-                        categories:
-                            categoryCodes.join(","),
+                        ${statusHTML}
 
+                        ${mapsButton}
 
-                        categoryLabels:
-                            categoryLabels,
+                    </div>
 
+                `;
 
-                        hasVegan:
-                            categoryCodes.includes("v")
-                                ? 1
-                                : 0,
+                new maplibregl.Popup({
 
+                    offset: 12
 
-                        hasLactoOvo:
-                            categoryCodes.includes("l")
-                                ? 1
-                                : 0,
+                })
 
+                    .setLngLat(
+                        feature.geometry.coordinates
+                    )
 
-                        hasNoAlliums:
-                            categoryCodes.includes("n")
-                                ? 1
-                                : 0,
+                    .setHTML(
+                        popupHTML
+                    )
 
-
-                        hasDessert:
-                            categoryCodes.includes("d")
-                                ? 1
-                                : 0,
-
-
-                        isOpen:
-                            status.isOpen
-                                ? 1
-                                : 0,
-
-
-                        statusKnown:
-                            status.known
-                                ? 1
-                                : 0,
-
-
-                        statusMessage:
-                            status.message,
-
-
-                        googleMapsURL:
-                            googleMapsURL
-
-                    }
-
-                });
+                    .addTo(map);
 
             }
 
 
-            return {
+            /* ==================================
+               CLICK OPEN
+               ================================== */
 
-                type: "FeatureCollection",
+            map.on(
+                "click",
+                "restaurants-open",
+                function (event) {
 
-                features: features
+                    const feature =
+                        event.features[0];
 
-            };
+                    showRestaurantPopup(
+                        feature
+                    );
 
-        }
-
-
-        /* ==========================================
-           LOAD RESTAURANTS
-           ========================================== */
-
-        async function loadRestaurants() {
-
-            console.log(
-                "Loading Google Sheet..."
+                }
             );
 
 
-            try {
+            /* ==================================
+               CLICK CLOSED
+               ================================== */
 
-                const response =
-                    await fetch(
-                        GOOGLE_SHEET_CSV
-                    );
+            map.on(
+                "click",
+                "restaurants-closed",
+                function (event) {
 
+                    const feature =
+                        event.features[0];
 
-                if (!response.ok) {
-
-                    throw new Error(
-                        `Google Sheet request failed: ${response.status}`
-                    );
-
-                }
-
-
-                const csv =
-                    await response.text();
-
-
-                const rows =
-                    parseCSV(csv);
-
-
-                console.log(
-                    "CSV rows:",
-                    rows.length
-                );
-
-
-                if (rows.length === 0) {
-
-                    throw new Error(
-                        "Google Sheet returned no restaurant rows."
+                    showRestaurantPopup(
+                        feature
                     );
 
                 }
+            );
 
 
-                const geojson =
-                    createGeoJSON(rows);
+            /* ==================================
+               CURSOR
+               ================================== */
 
+            map.on(
+                "mouseenter",
+                "restaurants-open",
+                function () {
 
-                console.log(
-                    "Restaurants loaded:",
-                    geojson.features.length
-                );
-
-
-                if (
-                    geojson.features.length === 0
-                ) {
-
-                    throw new Error(
-                        "No valid restaurant coordinates were found."
-                    );
+                    map.getCanvas()
+                        .style.cursor =
+                        "pointer";
 
                 }
+            );
 
+            map.on(
+                "mouseleave",
+                "restaurants-open",
+                function () {
 
-                /* ==================================
-                   ADD SOURCE
-                   ================================== */
-
-                map.addSource(
-                    "restaurants",
-                    {
-
-                        type: "geojson",
-
-                        data: geojson
-
-                    }
-                );
-
-
-                /* ==================================
-                   OPEN RESTAURANTS
-                   ================================== */
-
-                map.addLayer({
-
-                    id: "restaurants-open",
-
-                    type: "circle",
-
-                    source: "restaurants",
-
-                    filter: [
-                        "==",
-                        ["get", "isOpen"],
-                        1
-                    ],
-
-                    paint: {
-
-                        "circle-radius": 7,
-
-                        "circle-color": "#3fae5a",
-
-                        "circle-stroke-color":
-                            "#ffffff",
-
-                        "circle-stroke-width": 2
-
-                    }
-
-                });
-
-
-                /* ==================================
-                   CLOSED RESTAURANTS
-                   ================================== */
-
-                map.addLayer({
-
-                    id: "restaurants-closed",
-
-                    type: "circle",
-
-                    source: "restaurants",
-
-                    filter: [
-                        "==",
-                        ["get", "isOpen"],
-                        0
-                    ],
-
-                    paint: {
-
-                        "circle-radius": 7,
-
-                        "circle-color": "#a7a7a7",
-
-                        "circle-stroke-color":
-                            "#ffffff",
-
-                        "circle-stroke-width": 2
-
-                    }
-
-                });
-
-
-                /* ==================================
-                   POPUP
-                   ================================== */
-
-                function showRestaurantPopup(
-                    feature
-                ) {
-
-                    const properties =
-                        feature.properties;
-
-
-                    const name =
-                        escapeHTML(
-                            properties.name
-                        );
-
-
-                    const categoryLabels =
-                        escapeHTML(
-                            properties.categoryLabels ||
-                            "Vegetarian"
-                        );
-
-
-                    const statusMessage =
-                        escapeHTML(
-                            properties.statusMessage ||
-                            "Hours unavailable"
-                        );
-
-
-                    const isOpen =
-                        Number(
-                            properties.isOpen
-                        ) === 1;
-
-
-                    const googleMapsURL =
-                        properties.googleMapsURL ||
+                    map.getCanvas()
+                        .style.cursor =
                         "";
 
+                }
+            );
 
-                    const statusHTML =
+            map.on(
+                "mouseenter",
+                "restaurants-closed",
+                function () {
 
-                        isOpen
-
-                            ? `
-                                <div
-                                    class="status status-open"
-                                >
-                                    ● ${statusMessage}
-                                </div>
-                              `
-
-                            : `
-                                <div
-                                    class="status status-closed"
-                                >
-                                    ● ${statusMessage}
-                                </div>
-                              `;
-
-
-                    const mapsButton =
-
-                        googleMapsURL
-
-                            ? `
-                                <a
-                                    class="google-button"
-                                    href="${escapeHTML(
-                                        googleMapsURL
-                                    )}"
-                                    target="_blank"
-                                    rel="noopener"
-                                    aria-label="Open in Google Maps"
-                                    title="Open in Google Maps"
-                                >
-                                    🗺️
-                                </a>
-                              `
-
-                            : "";
-
-
-                    const weeklyHoursHTML =
-                        getWeeklyHoursHTML(
-                            properties
-                        );
-
-
-                    /*
-                     * The schedule is generated
-                     * from the original row.
-                     *
-                     * Because the GeoJSON properties
-                     * contain the compact status data,
-                     * we rebuild the grouped hours
-                     * from the stored values below.
-                     */
-
-                    const schedule =
-                        getWeeklySchedule(
-                            properties
-                        );
-
-
-                    /*
-                     * For popup hours, the original
-                     * restaurant row is stored separately
-                     * below when available.
-                     *
-                     * Fall back to the already-created
-                     * grouped HTML.
-                     */
-
-                    const popupHTML = `
-
-                        <div
-                            class="restaurant-card"
-                        >
-
-                            <div
-                                class="restaurant-header"
-                            >
-
-                                <div
-                                    class="restaurant-name"
-                                >
-                                    ${name}
-                                </div>
-
-                                ${mapsButton}
-
-                            </div>
-
-
-                            <div
-                                class="restaurant-type"
-                            >
-                                ${categoryLabels}
-                            </div>
-
-
-                            ${statusHTML}
-
-
-                            <div
-                                class="restaurant-hours"
-                            >
-                                ${weeklyHoursHTML}
-                            </div>
-
-                        </div>
-
-                    `;
-
-
-                    new maplibregl.Popup({
-
-                        offset: 12
-
-                    })
-
-                        .setLngLat(
-                            feature.geometry.coordinates
-                        )
-
-                        .setHTML(
-                            popupHTML
-                        )
-
-                        .addTo(map);
+                    map.getCanvas()
+                        .style.cursor =
+                        "pointer";
 
                 }
+            );
+
+            map.on(
+                "mouseleave",
+                "restaurants-closed",
+                function () {
+
+                    map.getCanvas()
+                        .style.cursor =
+                        "";
+
+                }
+            );
 
 
-                /* ==================================
-                   CLICK OPEN
-                   ================================== */
+            /* ==================================
+               CATEGORY FILTERS
+               ================================== */
 
-                map.on(
-                    "click",
-                    "restaurants-open",
-                    function (event) {
-
-                        const feature =
-                            event.features[0];
-
-
-                        showRestaurantPopup(
-                            feature
-                        );
-
-                    }
+            const categoryButtons =
+                document.querySelectorAll(
+                    ".category-button"
                 );
 
+            categoryButtons.forEach(
+                button => {
 
-                /* ==================================
-                   CLICK CLOSED
-                   ================================== */
+                    button.addEventListener(
+                        "click",
+                        function () {
 
-                map.on(
-                    "click",
-                    "restaurants-closed",
-                    function (event) {
-
-                        const feature =
-                            event.features[0];
-
-
-                        showRestaurantPopup(
-                            feature
-                        );
-
-                    }
-                );
-
-
-                /* ==================================
-                   CURSOR
-                   ================================== */
-
-                map.on(
-                    "mouseenter",
-                    "restaurants-open",
-                    function () {
-
-                        map.getCanvas()
-                            .style.cursor =
-                            "pointer";
-
-                    }
-                );
-
-
-                map.on(
-                    "mouseleave",
-                    "restaurants-open",
-                    function () {
-
-                        map.getCanvas()
-                            .style.cursor =
-                            "";
-
-                    }
-                );
-
-
-                map.on(
-                    "mouseenter",
-                    "restaurants-closed",
-                    function () {
-
-                        map.getCanvas()
-                            .style.cursor =
-                            "pointer";
-
-                    }
-                );
-
-
-                map.on(
-                    "mouseleave",
-                    "restaurants-closed",
-                    function () {
-
-                        map.getCanvas()
-                            .style.cursor =
-                            "";
-
-                    }
-                );
-
-
-                /* ==================================
-                   CATEGORY FILTERS
-                   ================================== */
-
-                const categoryButtons =
-                    document.querySelectorAll(
-                        ".category-button"
-                    );
-
-
-                categoryButtons.forEach(
-                    button => {
-
-                        button.addEventListener(
-                            "click",
-                            function () {
-
-                                categoryButtons
-                                    .forEach(
-                                        item =>
-                                            item.classList.remove(
-                                                "active"
-                                            )
-                                    );
-
-
-                                button.classList.add(
-                                    "active"
+                            categoryButtons
+                                .forEach(
+                                    item =>
+                                        item.classList.remove(
+                                            "active"
+                                        )
                                 );
 
+                            button.classList.add(
+                                "active"
+                            );
 
-                                const category =
-                                    button.dataset.category;
+                            const category =
+                                button.dataset.category;
 
+                            let property =
+                                null;
 
-                                let property =
-                                    null;
+                            if (
+                                category ===
+                                "vegan"
+                            ) {
 
+                                property =
+                                    "hasVegan";
 
-                                if (
-                                    category ===
-                                    "vegan"
-                                ) {
+                            } else if (
+                                category ===
+                                "lacto-ovo"
+                            ) {
 
-                                    property =
-                                        "hasVegan";
+                                property =
+                                    "hasLactoOvo";
 
-                                }
+                            } else if (
+                                category ===
+                                "no-alliums"
+                            ) {
 
-                                else if (
-                                    category ===
-                                    "lacto-ovo"
-                                ) {
+                                property =
+                                    "hasNoAlliums";
 
-                                    property =
-                                        "hasLactoOvo";
+                            } else if (
+                                category ===
+                                "dessert"
+                            ) {
 
-                                }
+                                property =
+                                    "hasDessert";
 
-                                else if (
-                                    category ===
-                                    "no-alliums"
-                                ) {
-
-                                    property =
-                                        "hasNoAlliums";
-
-                                }
-
-                                else if (
-                                    category ===
-                                    "dessert"
-                                ) {
-
-                                    property =
-                                        "hasDessert";
-
-                                }
+                            }
 
 
-                                if (
-                                    property ===
-                                    null
-                                ) {
-
-                                    map.setFilter(
-                                        "restaurants-open",
-                                        [
-                                            "==",
-                                            ["get", "isOpen"],
-                                            1
-                                        ]
-                                    );
-
-
-                                    map.setFilter(
-                                        "restaurants-closed",
-                                        [
-                                            "==",
-                                            ["get", "isOpen"],
-                                            0
-                                        ]
-                                    );
-
-
-                                    return;
-
-                                }
-
+                            if (
+                                property ===
+                                null
+                            ) {
 
                                 map.setFilter(
                                     "restaurants-open",
                                     [
-
-                                        "all",
-
-                                        [
-                                            "==",
-                                            ["get", "isOpen"],
-                                            1
-                                        ],
-
-                                        [
-                                            "==",
-                                            ["get", property],
-                                            1
-                                        ]
-
+                                        "==",
+                                        ["get", "isOpen"],
+                                        1
                                     ]
                                 );
-
 
                                 map.setFilter(
                                     "restaurants-closed",
                                     [
-
-                                        "all",
-
-                                        [
-                                            "==",
-                                            ["get", "isOpen"],
-                                            0
-                                        ],
-
-                                        [
-                                            "==",
-                                            ["get", property],
-                                            1
-                                        ]
-
+                                        "==",
+                                        ["get", "isOpen"],
+                                        0
                                     ]
                                 );
 
+                                return;
+
                             }
-                        );
-
-                    }
-                );
 
 
-                /* ==================================
-                   FIT MAP TO RESTAURANTS
-                   ================================== */
+                            map.setFilter(
+                                "restaurants-open",
+                                [
+                                    "all",
 
-                const bounds =
-                    new maplibregl.LngLatBounds();
+                                    [
+                                        "==",
+                                        ["get", "isOpen"],
+                                        1
+                                    ],
 
+                                    [
+                                        "==",
+                                        ["get", property],
+                                        1
+                                    ]
 
-                geojson.features.forEach(
-                    feature => {
-
-                        bounds.extend(
-                            feature.geometry.coordinates
-                        );
-
-                    }
-                );
-
-
-                map.fitBounds(
-                    bounds,
-                    {
-
-                        padding: {
-
-                            top: 180,
-
-                            bottom: 60,
-
-                            left: 40,
-
-                            right: 40
-
-                        },
-
-                        maxZoom: 13,
-
-                        duration: 800
-
-                    }
-                );
+                                ]
+                            );
 
 
-                /* ==================================
-                   HIDE LOADING
-                   ================================== */
+                            map.setFilter(
+                                "restaurants-closed",
+                                [
+                                    "all",
 
-                loading.classList.add(
-                    "hidden"
-                );
+                                    [
+                                        "==",
+                                        ["get", "isOpen"],
+                                        0
+                                    ],
 
+                                    [
+                                        "==",
+                                        ["get", property],
+                                        1
+                                    ]
 
-                console.log(
-                    "veg&me map is ready!"
-                );
+                                ]
+                            );
 
-            }
-
-
-            catch (error) {
-
-                console.error(
-                    "veg&me loading error:",
-                    error
-                );
-
-
-                loading.textContent =
-                    "Unable to load restaurant data.";
-
-            }
-
-        }
-
-
-        /* ==========================================
-           MAP LOAD
-           ========================================== */
-
-        map.on(
-            "load",
-            function () {
-
-                console.log(
-                    "MapLibre map loaded."
-                );
-
-
-                loadRestaurants();
-
-            }
-        );
-
-
-        /* ==========================================
-           SEARCH BUTTON
-           ========================================== */
-
-        document
-            .getElementById("search-button")
-            .addEventListener(
-                "click",
-                function () {
-
-                    alert(
-                        "Search will be added next."
+                        }
                     );
 
                 }
             );
 
-    </script>
+
+            /* ==================================
+               FIT MAP TO RESTAURANTS
+               ================================== */
+
+            const bounds =
+                new maplibregl.LngLatBounds();
+
+            geojson.features.forEach(
+                feature => {
+
+                    bounds.extend(
+                        feature.geometry.coordinates
+                    );
+
+                }
+            );
+
+            map.fitBounds(
+                bounds,
+                {
+                    padding: {
+                        top: 180,
+                        bottom: 60,
+                        left: 40,
+                        right: 40
+                    },
+
+                    maxZoom: 13,
+
+                    duration: 800
+                }
+            );
+
+
+            /* ==================================
+               HIDE LOADING
+               ================================== */
+
+            loading.classList.add(
+                "hidden"
+            );
+
+            console.log(
+                "veg&me map is ready!"
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "veg&me loading error:",
+                error
+            );
+
+            loading.textContent =
+                "Unable to load restaurant data.";
+
+        }
+
+    }
+
+
+    /* ==========================================
+       MAP LOAD
+       ========================================== */
+
+    map.on(
+        "load",
+        function () {
+
+            console.log(
+                "MapLibre map loaded."
+            );
+
+            loadRestaurants();
+
+        }
+    );
+
+
+    /* ==========================================
+       SEARCH BUTTON
+       ========================================== */
+
+    document
+        .getElementById("search-button")
+        .addEventListener(
+            "click",
+            function () {
+
+                alert(
+                    "Search will be added next."
+                );
+
+            }
+        );
+
+</script>
 
 </body>
 
